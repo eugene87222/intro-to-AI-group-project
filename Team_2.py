@@ -1,6 +1,7 @@
 import os
 import random
 import STcpClient
+from datetime import datetime
 
 '''
     輪到此程式移動棋子
@@ -88,6 +89,42 @@ def GetValidMoves(board, is_black):
             else:
                 print(f'ERROR, unknown value at {board[r][c]}')
     return list(moves)
+
+
+def Max(depth, lifetime, alpha, beta):
+    if depth>1000 or datetime.datetime.now()>lifetime:
+        # 超時或太深
+        # evaluate 並 return score
+        return NotImplementedError
+    v = -1e10
+    # 把可以走的每一步都列出來
+    next_steps = [None]
+    for step in next_steps:
+        v = max(v, Min(depth+1, lifetime, alpha, beta))
+        if v >= beta:
+            return v
+        alpha = max(alpha, v)
+    return v
+
+
+def Min(depth, lifetime, alpha, beta):
+    if depth>1000 or datetime.datetime.now()>lifetime:
+        # 超時或太深
+        # evaluate 並 return score
+        return NotImplementedError
+    v = 1e10
+    # 把可以走的每一步都列出來
+    next_steps = [None]
+    for step in next_steps:
+        v = min(v, Max(depth+1, lifetime, alpha, beta))
+        if v <= alpha:
+            return v
+        beta = min(beta, v)
+    return v
+
+
+def alpha_beta_pruning():
+    pass
 
 
 def GetStep(board, is_black):
