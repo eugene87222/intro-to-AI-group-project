@@ -68,7 +68,7 @@ def GetValidMove(board, pos, direction, is_black):
 
 def GetValidMoves(board, is_black):
     moves = set()
-    player, opponent = (BLACK, WHITE) if is_black else (BLACK, WHITE)
+    player, opponent = (BLACK, WHITE) if is_black else (WHITE, BLACK)
     for r in range(HEIGHT):
         for c in range(WIDTH):
             if board[r][c] == CORNER:
@@ -87,7 +87,7 @@ def GetValidMoves(board, is_black):
                     moves.add((r, c))
             else:
                 print(f'ERROR, unknown value at {board[r][c]}')
-    return moves
+    return list(moves)
 
 
 def GetStep(board, is_black):
@@ -95,10 +95,8 @@ def GetStep(board, is_black):
     Example:
     x = random.randint(0, 7)
     y = random.randint(0, 7)
-    return (x,y)
+    return (x, y)
     '''
-    x = random.randint(0, 7)
-    y = random.randint(0, 7)
     moves = GetValidMoves(board, is_black)
     if is_black:
         with open(f'./output_black/{cnt}.log', 'w') as file:
@@ -114,7 +112,7 @@ def GetStep(board, is_black):
             file.write('\n')
             for move in moves:
                 file.write(f'{move}\n')
-    return (x, y)
+    return random.choice(moves)
 
 
 os.mkdir('output_black')
