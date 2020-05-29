@@ -123,7 +123,7 @@ def Min(depth, lifetime, alpha, beta):
     return v
 
 
-def alpha_beta_pruning():
+def AlphaBetaPruning():
     pass
 
 
