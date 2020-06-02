@@ -45,4 +45,4 @@
 
 # Note
 
-~~Team_2.py 會開兩個目錄，output_black 跟 output_white，只是用來把對局過程中的盤面 output 成文字檔，debug 用的而已~~暫時關掉
+~~Team_2.py 會開兩個目錄，output_black 跟 output_white，只是用來把對局過程中的盤面 output 成文字檔，debug 用的而已~~ 暫時關掉
