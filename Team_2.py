@@ -16,8 +16,8 @@ from datetime import datetime, timedelta
 '''
 
 INF = 1e10
-MAX_DEPTH = 10
-DURATION = 4.7
+MAX_DEPTH = 5
+DURATION = 4.8
 WEIGHT_PIECE = 2.0
 WEIGHT_EDGE = 1.5
 WEIGHT_MOVE = 1.8

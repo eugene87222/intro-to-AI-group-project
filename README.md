@@ -76,6 +76,19 @@ WEIGHT_MOVE = 1.8
 - 平手：3
 - 勝率：67.5%
 
+---
+
+```
+MAX_DEPTH = 10
+DURATION = 4.7
+WEIGHT_PIECE = 2.0
+WEIGHT_EDGE = 1.5
+WEIGHT_MOVE = 1.8
+```
+- 我方勝場：24
+- 平手：0
+- 勝率：60.0%
+
 # TODO
 
 - [x] GetValidMove
