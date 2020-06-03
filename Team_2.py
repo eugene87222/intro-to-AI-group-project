@@ -152,12 +152,13 @@ def Evaluate(board, is_black):
                     opponent_edge += 1
             else:
                 print(f'ERROR, unknown value at {board[r][c]}')
-    if player_piece > opponent_piece:
-        piece_score = 1
-    elif player_piece == opponent_piece:
-        piece_score = 0
-    else:
-        piece_score = -1
+    # if player_piece > opponent_piece:
+    #     piece_score = 1
+    # elif player_piece == opponent_piece:
+    #     piece_score = 0
+    # else:
+    #     piece_score = -1
+    piece_score = player_piece - opponent_piece
     edge_score = player_edge - opponent_edge
     return piece_score*2 + edge_score*1.5 + len(moves)*1.8
 
