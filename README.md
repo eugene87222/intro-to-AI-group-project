@@ -30,7 +30,7 @@
   - calculate the score of current board
   - things being taken into account
     - number of pieces on the edge (weight 1.5)
-    - number of available moves (weight 0)
+    - number of available moves (weight 1.8)
     - number of total pieces (weight 2)
 
 - `Max(board, is_black, depth, lifetime, alpha, beta)`

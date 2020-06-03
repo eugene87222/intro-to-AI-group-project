@@ -159,7 +159,7 @@ def Evaluate(board, is_black):
     else:
         piece_score = -1
     edge_score = player_edge - opponent_edge
-    return piece_score * 2 + edge_score * 1.5
+    return piece_score*2 + edge_score*1.5 + len(moves)*1.8
 
 
 def Max(board, is_black, depth, lifetime, alpha, beta):
