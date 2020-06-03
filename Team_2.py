@@ -15,10 +15,12 @@ from datetime import datetime, timedelta
             r, c 表示要下棋子的座標位置 (row, column) (zero-base)
 '''
 
-# cnt = 0
-
 INF = 1e10
-MAX_DEPTH = 100
+MAX_DEPTH = 10
+DURATION = 4.7
+WEIGHT_PIECE = 2.0
+WEIGHT_EDGE = 1.5
+WEIGHT_MOVE = 1.8
 
 CORNER = -1
 EMPTY = 0
@@ -50,49 +52,160 @@ def OutOfBoard(pos, direction):
     return False, (new_r, new_c)
 
 
-def GetValidMove(board, pos, direction, is_black):
+def IsValidMove(board, pos, direction, is_black):
     res = OutOfBoard(pos, direction)
     # first element indicates whether this move is out of board or not
     # second element indicates the position after this move
     if not res[0]:
-        pos = res[1]
+        next_pos = res[1]
     else:
-        return False, pos
-    opponent = WHITE if is_black else BLACK
-    if board[pos[0]][pos[1]] == opponent:
-        while board[pos[0]][pos[1]] == opponent:
-            res = OutOfBoard(pos, direction)
+        return False
+    player, opponent = (BLACK, WHITE) if is_black else (WHITE, BLACK)
+    if board[next_pos[0]][next_pos[1]] == opponent:
+        while board[next_pos[0]][next_pos[1]] == opponent:
+            res = OutOfBoard(next_pos, direction)
             if res[0]:
-                break
+                return False
             else:
-                pos = res[1]
-        if board[pos[0]][pos[1]] == EMPTY:
-            return True, pos
-    return False, pos
+                next_pos = res[1]
+        if board[next_pos[0]][next_pos[1]] == player:
+            return True
+    return False
 
 
 def GetValidMoves(board, is_black):
-    moves = set()
+    moves = []
     player, opponent = (BLACK, WHITE) if is_black else (WHITE, BLACK)
-    for r in range(HEIGHT):
-        for c in range(WIDTH):
-            if board[r][c] == CORNER:
-                continue
-            elif board[r][c] == opponent:
-                continue
-            elif board[r][c] == player:
-                for d in DIRECTIONS:
-                    # first element indicates whether returned position is valid after this move
-                    # second element is the position after this move
-                    res = GetValidMove(board, (r, c), d, is_black)
-                    if res[0]:
-                        moves.add(res[1])
-            elif board[r][c] == EMPTY:
-                if r>0 and r<HEIGHT-1 and c>0 and c<WIDTH-1:
-                    moves.add((r, c))
-            else:
-                print(f'ERROR, unknown value at {board[r][c]}')
-    return list(moves)
+    # upper edge ==============================================================
+    if board[0][1] == EMPTY:
+        for d in [SOUTH, SOUTHEAST, EAST]:
+            if IsValidMove(board, (0, 1), d, is_black):
+                moves.append((0, 1))
+                break
+    if board[0][2] == EMPTY:
+        for d in [SOUTHWEST, SOUTH, SOUTHEAST, EAST]:
+            if IsValidMove(board, (0, 2), d, is_black):
+                moves.append((0, 2))
+                break
+    if board[0][3] == EMPTY:
+        for d in [WEST, SOUTHWEST, SOUTH, SOUTHEAST, EAST]:
+            if IsValidMove(board, (0, 3), d, is_black):
+                moves.append((0, 3))
+                break
+    if board[0][4] == EMPTY:
+        for d in [WEST, SOUTHWEST, SOUTH, SOUTHEAST, EAST]:
+            if IsValidMove(board, (0, 4), d, is_black):
+                moves.append((0, 4))
+                break
+    if board[0][5] == EMPTY:
+        for d in [WEST, SOUTHWEST, SOUTH, SOUTHEAST]:
+            if IsValidMove(board, (0, 5), d, is_black):
+                moves.append((0, 5))
+                break
+    if board[0][6] == EMPTY:
+        for d in [WEST, SOUTHWEST, SOUTH]:
+            if IsValidMove(board, (0, 6), d, is_black):
+                moves.append((0, 6))
+                break
+    # left edge ==============================================================
+    if board[1][0] == EMPTY:
+        for d in [EAST, SOUTHEAST, SOUTH]:
+            if IsValidMove(board, (1, 0), d, is_black):
+                moves.append((1, 0))
+                break
+    if board[2][0] == EMPTY:
+        for d in [NORTHEAST, EAST, SOUTHEAST, SOUTH]:
+            if IsValidMove(board, (2, 0), d, is_black):
+                moves.append((2, 0))
+                break
+    if board[3][0] == EMPTY:
+        for d in [NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH]:
+            if IsValidMove(board, (3, 0), d, is_black):
+                moves.append((3, 0))
+                break
+    if board[4][0] == EMPTY:
+        for d in [NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH]:
+            if IsValidMove(board, (4, 0), d, is_black):
+                moves.append((4, 0))
+                break
+    if board[5][0] == EMPTY:
+        for d in [NORTH, NORTHEAST, EAST, SOUTHEAST]:
+            if IsValidMove(board, (5, 0), d, is_black):
+                moves.append((5, 0))
+                break
+    if board[6][0] == EMPTY:
+        for d in [NORTH, NORTHEAST, EAST]:
+            if IsValidMove(board, (6, 0), d, is_black):
+                moves.append((6, 0))
+                break
+    # lower edge ==============================================================
+    if board[7][1] == EMPTY:
+        for d in [NORTH, NORTHEAST, EAST]:
+            if IsValidMove(board, (7, 1), d, is_black):
+                moves.append((7, 1))
+                break
+    if board[7][2] == EMPTY:
+        for d in [NORTHWEST, NORTH, NORTHEAST, EAST]:
+            if IsValidMove(board, (7, 2), d, is_black):
+                moves.append((7, 2))
+                break
+    if board[7][3] == EMPTY:
+        for d in [WEST, NORTHWEST, NORTH, NORTHEAST, EAST]:
+            if IsValidMove(board, (7, 3), d, is_black):
+                moves.append((7, 3))
+                break
+    if board[7][4] == EMPTY:
+        for d in [WEST, NORTHWEST, NORTH, NORTHEAST, EAST]:
+            if IsValidMove(board, (7, 4), d, is_black):
+                moves.append((7, 4))
+                break
+    if board[7][5] == EMPTY:
+        for d in [WEST, NORTHWEST, NORTH, NORTHEAST]:
+            if IsValidMove(board, (7, 5), d, is_black):
+                moves.append((7, 5))
+                break
+    if board[7][6] == EMPTY:
+        for d in [WEST, NORTHWEST, NORTH]:
+            if IsValidMove(board, (7, 6), d, is_black):
+                moves.append((7, 6))
+                break
+    # right edge ==============================================================
+    if board[1][7] == EMPTY:
+        for d in [WEST, SOUTHWEST, SOUTH]:
+            if IsValidMove(board, (1, 7), d, is_black):
+                moves.append((1, 7))
+                break
+    if board[2][7] == EMPTY:
+        for d in [NORTHWEST, WEST, SOUTHWEST, SOUTH]:
+            if IsValidMove(board, (2, 7), d, is_black):
+                moves.append((2, 7))
+                break
+    if board[3][7] == EMPTY:
+        for d in [NORTH, NORTHWEST, WEST, SOUTHWEST, SOUTH]:
+            if IsValidMove(board, (3, 7), d, is_black):
+                moves.append((3, 7))
+                break
+    if board[4][7] == EMPTY:
+        for d in [NORTH, NORTHWEST, WEST, SOUTHWEST, SOUTH]:
+            if IsValidMove(board, (4, 7), d, is_black):
+                moves.append((4, 7))
+                break
+    if board[5][7] == EMPTY:
+        for d in [NORTH, NORTHWEST, WEST, SOUTHWEST]:
+            if IsValidMove(board, (5, 7), d, is_black):
+                moves.append((5, 7))
+                break
+    if board[6][7] == EMPTY:
+        for d in [NORTH, NORTHWEST, WEST]:
+            if IsValidMove(board, (6, 7), d, is_black):
+                moves.append((6, 7))
+                break
+    # central 6x6 =============================================================
+    for r in range(1, HEIGHT-1):
+        for c in range(1, WIDTH-1):
+            if board[r][c] == EMPTY:
+                moves.append((r, c))
+    return moves
 
 
 def CheckFlip(board, pos, direction, is_black):
@@ -152,23 +265,17 @@ def Evaluate(board, is_black):
                     opponent_edge += 1
             else:
                 print(f'ERROR, unknown value at {board[r][c]}')
-    # if player_piece > opponent_piece:
-    #     piece_score = 1
-    # elif player_piece == opponent_piece:
-    #     piece_score = 0
-    # else:
-    #     piece_score = -1
     piece_score = player_piece - opponent_piece
     edge_score = player_edge - opponent_edge
-    return piece_score*2 + edge_score*1.5 + len(moves)*1.8
+    return piece_score*WEIGHT_PIECE + edge_score*WEIGHT_EDGE + len(moves)*WEIGHT_MOVE
 
 
 def Max(board, is_black, depth, lifetime, alpha, beta):
     if depth>MAX_DEPTH or datetime.now()>lifetime:
         # time exceeded or too deep -> evaluate and return score
         return Evaluate(board, is_black)
-    v = -1e10
-    # list every valid move
+    v = -INF
+    # list all valid moves
     next_steps = GetValidMoves(board, is_black)
     for step in next_steps:
         v = max(v, Min(board, not is_black, depth+1, lifetime, alpha, beta))
@@ -182,8 +289,8 @@ def Min(board, is_black, depth, lifetime, alpha, beta):
     if depth>MAX_DEPTH or datetime.now()>lifetime:
         # time exceeded or too deep -> evaluate and return score
         return Evaluate(board, is_black)
-    v = 1e10
-    # list every valid move
+    v = INF
+    # list all valid moves
     next_steps = GetValidMoves(board, is_black)
     for step in next_steps:
         v = min(v, Max(board, not is_black, depth+1, lifetime, alpha, beta))
@@ -218,46 +325,10 @@ def GetStep(board, is_black):
     y = random.randint(0, 7)
     return (x, y)
     '''
-    # moves = GetValidMoves(board, is_black)
-    # if is_black:
-    #     with open(f'./output_black/{cnt}.log', 'w') as file:
-    #         for row in board:
-    #             for col in row:
-    #                 file.write(f'{col:>2} ')
-    #             file.write('\n')
-    #         file.write('\n')
-    #         for move in moves:
-    #             new_board = PlaceAndFlip(board, move, is_black)
-    #             file.write(f'{move}\n')
-    #             for row in new_board:
-    #                 for col in row:
-    #                     file.write(f'{col:>2} ')
-    #                 file.write('\n')
-    #             file.write('\n')
-    # else:
-    #     with open(f'./output_white/{cnt}.log', 'w') as file:
-    #         for row in board:
-    #             for col in row:
-    #                 file.write(f'{col:>2} ')
-    #             file.write('\n')
-    #         file.write('\n')
-    #         for move in moves:
-    #             new_board = PlaceAndFlip(board, move, is_black)
-    #             file.write(f'{move}\n')
-    #             for row in new_board:
-    #                 for col in row:
-    #                     file.write(f'{col:>2} ')
-    #                 file.write('\n')
-    #             file.write('\n')
-    # return random.choice(moves)
-
-    lifetime = datetime.now() + timedelta(seconds=4.4)
+    lifetime = datetime.now() + timedelta(seconds=DURATION)
     move = AlphaBetaPruning(board, is_black, lifetime)
     return move
 
-
-# os.mkdir('output_black')
-# os.mkdir('output_white')
 
 while(True):
     (stop_program, id_package, board, is_black) = STcpClient.GetBoard()
@@ -266,4 +337,3 @@ while(True):
 
     Step = GetStep(board, is_black)
     STcpClient.SendStep(id_package, Step)
-    # cnt += 1
