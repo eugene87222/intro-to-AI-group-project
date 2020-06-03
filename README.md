@@ -1,3 +1,8 @@
+- Content
+  - [About Team_2.py](#About_Team_2.py)
+  - [Note](#Note)
+  - [TODO](#TODO)
+
 # About Team_2.py
 
 - 一堆 global variable
@@ -32,7 +37,7 @@
     - number of pieces on the edge
     - number of available moves
     - number of total pieces
-    - 權重比較請見[Note](#Note)
+    - 權重比較請見 [Note](#Note)
 
 - `Max(board, is_black, depth, lifetime, alpha, beta)`
   - minimax 的 max
@@ -70,3 +75,18 @@ WEIGHT_MOVE = 1.8
 - 我方勝場：27
 - 平手：3
 - 勝率：67.5%
+
+# TODO
+
+- [x] GetValidMove
+- [ ] 想 evaluate function
+  - 考慮的東西
+    - 四條邊上棋子的數量
+    - 棋子總數
+    - valid moves 的數量
+  - 權重比較請見 [Note](#Note)
+  - [ ] 權重可能還要修改
+  - [ ] 想想還有沒有什麼東西可以加入 evaluation function
+- [x] minimax algorithm
+- [x] alpha-beta pruning
+- [ ] 有沒有其他加速方式，讓搜尋深度可以加大
