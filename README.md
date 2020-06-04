@@ -39,6 +39,9 @@
     - number of total pieces
     - 權重比較請見 [Note](#Note)
 
+- `Stringify(board, is_black)`
+  - 把 `board` 裡面的所有值串成一個字串
+
 - `Max(board, is_black, depth, lifetime, alpha, beta)`
   - minimax 的 max
 
@@ -72,3 +75,4 @@
 - [x] minimax algorithm
 - [x] alpha-beta pruning
 - [ ] 有沒有其他加速方式，讓搜尋深度可以加大
+  - [x] 把 evaluate 過的盤面存在 `HISTORY` 裡面，就不用重複搜尋
