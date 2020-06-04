@@ -5,6 +5,13 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 
 '''
+ID : 2
+隊名 : 我拿交大畢業證書
+組長 : 0516034 楊翔鈞
+組員 : 0516118 黃泳繁
+'''
+
+'''
     輪到此程式移動棋子
     board : 棋盤狀態(list of list), board[i][j] = i row, j column 棋盤狀態(i, j 從 0 開始)
             0 = 空、1 = 黑、2 = 白、-1 = 四個角落
@@ -16,8 +23,8 @@ from datetime import datetime, timedelta
 '''
 
 INF = 1e10
-MAX_DEPTH = 5
-DURATION = 4.8
+MAX_DEPTH = 40
+DURATION = 4.9
 WEIGHT_PIECE = 2.0
 WEIGHT_EDGE = 1.5
 WEIGHT_MOVE = 1.8
@@ -36,11 +43,17 @@ SOUTH = [1, 0]
 SOUTHWEST = [1, -1]
 WEST = [0, -1]
 NORTHWEST = [-1, -1]
-
 DIRECTIONS = (NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH, SOUTHWEST, WEST, NORTHWEST)
+
+ROUND = -1
+HISTORY = {}
 
 
 def OutOfBoard(pos, direction):
+    '''first element indicates whether this move is out of board or not
+    
+    second element indicates the position after this move
+    '''
     new_r = pos[0] + direction[0]
     new_c = pos[1] + direction[1]
     if new_r<0 or new_r>=HEIGHT:
@@ -54,8 +67,6 @@ def OutOfBoard(pos, direction):
 
 def IsValidMove(board, pos, direction, is_black):
     res = OutOfBoard(pos, direction)
-    # first element indicates whether this move is out of board or not
-    # second element indicates the position after this move
     if not res[0]:
         next_pos = res[1]
     else:
@@ -205,13 +216,12 @@ def GetValidMoves(board, is_black):
         for c in range(1, WIDTH-1):
             if board[r][c] == EMPTY:
                 moves.append((r, c))
+    # random.shuffle(moves)
     return moves
 
 
 def CheckFlip(board, pos, direction, is_black):
     res = OutOfBoard(pos, direction)
-    # first element indicates whether this move is out of board or not
-    # second element indicates the position after this move
     flip = []
     if not res[0]:
         pos = res[1]
@@ -264,19 +274,36 @@ def Evaluate(board, is_black):
                 if r in [0, HEIGHT-1] or c in [0, WIDTH-1]:
                     opponent_edge += 1
             else:
-                print(f'ERROR, unknown value at {board[r][c]}')
-    piece_score = player_piece - opponent_piece
+                # print(f'ERROR, unknown value at {board[r][c]}')
+                pass
+    piece_score = 1 if player_piece>opponent_piece else 0 if player_piece==opponent_piece else -1
     edge_score = player_edge - opponent_edge
     return piece_score*WEIGHT_PIECE + edge_score*WEIGHT_EDGE + len(moves)*WEIGHT_MOVE
 
 
+def Stringify(board, is_black):
+    board_str = ''.join([''.join(map(str, row)) for row in board])
+    if is_black:
+        return f'B{board_str}'
+    else:
+        return f'W{board_str}'
+
+
 def Max(board, is_black, depth, lifetime, alpha, beta):
+    global HISTORY
+    board_str = Stringify(board, is_black)
+    if board_str in HISTORY:
+        return HISTORY[board_str]
     if depth>MAX_DEPTH or datetime.now()>lifetime:
-        # time exceeded or too deep -> evaluate and return score
-        return Evaluate(board, is_black)
+        score = Evaluate(board, is_black)
+        HISTORY[board_str] = score
+        return score
     v = -INF
-    # list all valid moves
     next_steps = GetValidMoves(board, is_black)
+    if len(next_steps) == 0:
+        score = Evaluate(board, is_black)
+        HISTORY[board_str] = score
+        return score
     for step in next_steps:
         v = max(v, Min(board, not is_black, depth+1, lifetime, alpha, beta))
         if v >= beta:
@@ -286,12 +313,20 @@ def Max(board, is_black, depth, lifetime, alpha, beta):
 
 
 def Min(board, is_black, depth, lifetime, alpha, beta):
+    global HISTORY
+    board_str = Stringify(board, is_black)
+    if board_str in HISTORY:
+        return HISTORY[board_str]
     if depth>MAX_DEPTH or datetime.now()>lifetime:
-        # time exceeded or too deep -> evaluate and return score
-        return Evaluate(board, is_black)
+        score = Evaluate(board, is_black)
+        HISTORY[board_str] = score
+        return score
     v = INF
-    # list all valid moves
     next_steps = GetValidMoves(board, is_black)
+    if len(next_steps) == 0:
+        score = Evaluate(board, is_black)
+        HISTORY[board_str] = score
+        return score
     for step in next_steps:
         v = min(v, Max(board, not is_black, depth+1, lifetime, alpha, beta))
         if v <= alpha:
@@ -309,22 +344,23 @@ def AlphaBetaPruning(board, is_black, lifetime):
     for move in moves:
         new_board = PlaceAndFlip(board, move, is_black)
         score = Min(new_board, not is_black, depth, lifetime, max_score ,INF)
-        if score > max_score:
+        if score >= max_score:
             max_score = score
             best_move = move
         if datetime.now() > lifetime:
-            print('moves 跑到一半')
+            # print('moves 跑到一半')
             break
     return move
 
 
 def GetStep(board, is_black):
-    '''
-    Example:
-    x = random.randint(0, 7)
-    y = random.randint(0, 7)
-    return (x, y)
-    '''
+    global ROUND, HISTORY
+    if ROUND == -1:
+        ROUND = is_black
+        HISTORY = {}
+    elif ROUND != is_black:
+        ROUND = is_black
+        HISTORY = {}
     lifetime = datetime.now() + timedelta(seconds=DURATION)
     move = AlphaBetaPruning(board, is_black, lifetime)
     return move

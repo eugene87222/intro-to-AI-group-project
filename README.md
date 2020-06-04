@@ -50,44 +50,13 @@
 
 # Note
 
-> 每組實驗跑 20 次，總共有 40 場對局
+> 每組實驗跑 20 次，共 40 場對局
 
-```
-MAX_DEPTH = 4
-DURATION = 4.5
-WEIGHT_PIECE = 2.0
-WEIGHT_EDGE = 1.5
-WEIGHT_MOVE = 1.8
-```
-- 我方勝場：26
-- 平手：1
-- 勝率：65.0%
-
----
-
-```
-MAX_DEPTH = 4
-DURATION = 4.6
-WEIGHT_PIECE = 2.0
-WEIGHT_EDGE = 1.5
-WEIGHT_MOVE = 1.8
-```
-- 我方勝場：27
-- 平手：3
-- 勝率：67.5%
-
----
-
-```
-MAX_DEPTH = 10
-DURATION = 4.7
-WEIGHT_PIECE = 2.0
-WEIGHT_EDGE = 1.5
-WEIGHT_MOVE = 1.8
-```
-- 我方勝場：24
-- 平手：0
-- 勝率：60.0%
+|參數|結果|
+|-|-|
+|MAX_DEPTH = 40<br/>DURATION = 4.9<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.5<br/>WEIGHT_MOVE = 1.8|我方勝場：36<br/>平手：0<br/>我方勝率：90.0%<br/>對方勝率：10.0%|
+|MAX_DEPTH = 50<br/>DURATION = 4.9<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.5<br/>WEIGHT_MOVE = 1.8|我方勝場：30<br/>平手：3<br/>我方勝率：75.0%<br/>對方勝率：17.5%|
+|MAX_DEPTH = 60<br/>DURATION = 4.9<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.5<br/>WEIGHT_MOVE = 1.8|我方勝場：29<br/>平手：2<br/>我方勝率：72.5%<br/>對方勝率：22.5%|
 
 # TODO
 
