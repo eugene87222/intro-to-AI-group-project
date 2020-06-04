@@ -7,8 +7,8 @@
 
 - 一堆 global variable
   - `INF`：隨便定的 infinity，目前設 1e10
-  - `MAX_DEPTH`：最大搜尋深度
-  - `DURATION`：思考時間，單位為秒
+  - `MAX_DEPTH`：最大搜尋深度，目前設定為 round(sqrt(72/目前可放置的位置總數) + 0.5)
+  - `DURATION`：思考時間，目前給 4.9 秒
   - `WEIGHT_PIECE, WEIGHT_EDGE, WEIGHT_MOVE`：各種權重
   - `CORNER, EMPTY, BLACK, WHITE`：隨便給數字，增加 code readability 而已
   - `WIDTH, HEIGHT`：盤面大小，8x8
@@ -57,9 +57,7 @@
 
 |參數|結果|
 |-|-|
-|MAX_DEPTH = 40<br/>DURATION = 4.9<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.5<br/>WEIGHT_MOVE = 1.8|我方勝場：36<br/>平手：0<br/>我方勝率：90.0%<br/>對方勝率：10.0%|
-|MAX_DEPTH = 50<br/>DURATION = 4.9<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.5<br/>WEIGHT_MOVE = 1.8|我方勝場：30<br/>平手：3<br/>我方勝率：75.0%<br/>對方勝率：17.5%|
-|MAX_DEPTH = 60<br/>DURATION = 4.9<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.5<br/>WEIGHT_MOVE = 1.8|我方勝場：29<br/>平手：2<br/>我方勝率：72.5%<br/>對方勝率：22.5%|
+|DURATION = 4.9<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.2<br/>WEIGHT_MOVE = 1.5|我方勝場：33<br/>平手：1<br/>我方勝率：82.5%<br/>對方勝率：15.0%|
 
 # TODO
 

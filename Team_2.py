@@ -2,6 +2,7 @@ import os
 import random
 import STcpClient
 from copy import deepcopy
+from math import sqrt
 from datetime import datetime, timedelta
 
 '''
@@ -23,11 +24,11 @@ ID : 2
 '''
 
 INF = 1e10
-MAX_DEPTH = 40
+MAX_DEPTH = -1
 DURATION = 4.9
 WEIGHT_PIECE = 2.0
-WEIGHT_EDGE = 1.5
-WEIGHT_MOVE = 1.8
+WEIGHT_EDGE = 1.2
+WEIGHT_MOVE = 1.5
 
 CORNER = -1
 EMPTY = 0
@@ -277,6 +278,7 @@ def Evaluate(board, is_black):
                 # print(f'ERROR, unknown value at {board[r][c]}')
                 pass
     piece_score = 1 if player_piece>opponent_piece else 0 if player_piece==opponent_piece else -1
+    # piece_score = player_piece - opponent_piece
     edge_score = player_edge - opponent_edge
     return piece_score*WEIGHT_PIECE + edge_score*WEIGHT_EDGE + len(moves)*WEIGHT_MOVE
 
@@ -298,14 +300,15 @@ def Max(board, is_black, depth, lifetime, alpha, beta):
         score = Evaluate(board, is_black)
         HISTORY[board_str] = score
         return score
-    v = -INF
-    next_steps = GetValidMoves(board, is_black)
-    if len(next_steps) == 0:
+    next_moves = GetValidMoves(board, is_black)
+    if len(next_moves) == 0:
         score = Evaluate(board, is_black)
         HISTORY[board_str] = score
         return score
-    for step in next_steps:
-        v = max(v, Min(board, not is_black, depth+1, lifetime, alpha, beta))
+    v = -INF
+    for move in next_moves:
+        new_board = PlaceAndFlip(board, move, is_black)
+        v = max(v, Min(new_board, is_black, depth+1, lifetime, alpha, beta))
         if v >= beta:
             return v
         alpha = max(alpha, v)
@@ -321,14 +324,15 @@ def Min(board, is_black, depth, lifetime, alpha, beta):
         score = Evaluate(board, is_black)
         HISTORY[board_str] = score
         return score
-    v = INF
-    next_steps = GetValidMoves(board, is_black)
-    if len(next_steps) == 0:
+    next_moves = GetValidMoves(board, not is_black)
+    if len(next_moves) == 0:
         score = Evaluate(board, is_black)
         HISTORY[board_str] = score
         return score
-    for step in next_steps:
-        v = min(v, Max(board, not is_black, depth+1, lifetime, alpha, beta))
+    v = INF
+    for move in next_moves:
+        new_board = PlaceAndFlip(board, move, not is_black)
+        v = min(v, Max(new_board, is_black, depth+1, lifetime, alpha, beta))
         if v <= alpha:
             return v
         beta = min(beta, v)
@@ -336,14 +340,16 @@ def Min(board, is_black, depth, lifetime, alpha, beta):
 
 
 def AlphaBetaPruning(board, is_black, lifetime):
+    global MAX_DEPTH
     depth = 0
     best_move = None
     max_score = -INF
     score = -INF
     moves = GetValidMoves(board, is_black)
+    MAX_DEPTH = round(sqrt(72//len(moves))+0.5)
     for move in moves:
         new_board = PlaceAndFlip(board, move, is_black)
-        score = Min(new_board, not is_black, depth, lifetime, max_score ,INF)
+        score = Min(new_board, is_black, depth, lifetime, max_score ,INF)
         if score >= max_score:
             max_score = score
             best_move = move
