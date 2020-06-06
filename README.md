@@ -5,6 +5,7 @@
 
 # About Team_2.py
 
+- 用 minimax 實作 AI
 - 一堆 global variable
   - `INF`：隨便定的 infinity，目前設 1e10
   - `MAX_DEPTH`：最大搜尋深度，目前設定為 round(sqrt(72/目前可放置的位置總數) + 0.5)
