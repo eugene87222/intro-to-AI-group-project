@@ -54,11 +54,12 @@
 
 # Note
 
-> 每組實驗跑 50 次，共 100 場對局
+> 每組實驗跑 200 次，共 400 場對局
 
 |參數|結果|
 |-|-|
-|DURATION = 4.9<br/>WEIGHT_PIECE = <br/>WEIGHT_EDGE = <br/>WEIGHT_MOVE = |我方勝場：<br/>平手：<br/>我方勝率：%<br/>對方勝率：%|
+|DURATION = 4.9<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 0.5<br/>WEIGHT_MOVE = 1.0|我方勝場：298<br/>平手：17<br/>我方勝率：74.5%<br/>對方勝率：21.25%|
+|DURATION = 4.9<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 2.0<br/>WEIGHT_MOVE = 1.0|我方勝場：283<br/>平手：20<br/>我方勝率：70.75%<br/>對方勝率：24.25%|
 
 # TODO
 
