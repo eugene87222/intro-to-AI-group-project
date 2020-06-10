@@ -20,10 +20,7 @@ NORTHWEST = [-1, -1]
 
 DIRECTIONS = (NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH, SOUTHWEST, WEST, NORTHWEST)
 
-n2m = {
-    -1: 'C',
-    0: ''
-}
+
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -748,36 +745,4 @@ if __SAVE_NET__:
         white.save_network()
     print('OK!')
 print('DONE!', bcolors.ENDC)
-
-
-# In[478]:
-
-
-for i in black.board:
-    print(i)
-print(black.weight)
-
-
-# In[484]:
-
-
-tmp = deepcopy(judger.board)
-flip_board = tmp[::-1]
-for i in tmp:
-    print(i)
-print('')
-
-tmp = [list(r) for r in zip(*tmp[::-1])]
-for i in tmp:
-    print(i)
-
-print('----------------------')
-for i in flip_board:
-    print(i)
-
-flip_board = tmp[::-1]
-
-print('--------------')
-for i in flip_board:
-    print(i)
 

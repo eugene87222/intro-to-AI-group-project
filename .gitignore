@@ -1,10 +1,7 @@
 __*
-build
-dist
 *.exe
-*.ipynb
 Team_2.py
 Team_2.spec
 white.p
 black.p
-
+*/
