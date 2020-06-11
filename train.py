@@ -4,9 +4,13 @@
 # In[1]:
 
 
+import timeit
+from IPython.display import display, clear_output
 from copy import deepcopy
-#import operator
-#import numpy as np
+
+from td_agent import *
+from othello import *
+
 WIDTH, HEIGHT = 8, 8
 NORTH = [-1, 0]
 NORTHEAST = [-1, 1]
@@ -19,6 +23,10 @@ NORTHWEST = [-1, -1]
 
 DIRECTIONS = (NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH, SOUTHWEST, WEST, NORTHWEST)
 
+WHITE = 2
+BLACK = 1
+EMPTY = 0
+CORNER = -1
 
 class bcolors:
     HEADER = '\033[95m'
@@ -34,31 +42,11 @@ class bcolors:
 # In[2]:
 
 
-# params
-WHITE = 2
-BLACK = 1
-EMPTY = 0
-CORNER = -1
-# agent params
-alpha = 0.5
-
-
-# In[ ]:
-
-
-
-
-
-# In[3]:
-
-
-ALL_N_TUPLE = 2
 # 從 pos 開始，把 n 個坐標 視作爲 一個tuple
 # n 決定 tuple 長度
 # d 決定 tuple 衍生方向
 # 回傳 list(整個 tuple 的所有坐標)
-
-def gen_tuple(pos=[0,0], n = ALL_N_TUPLE, d = SOUTH):
+def gen_tuple(pos=[0,0], n = 0, d = SOUTH):
     tup_list = []
     for t in range(n):
         tup_list.append(pos[:])
@@ -115,78 +103,9 @@ def tuple_set_two():
     return tuple_list, ALL_N_TUPLE
 
 
-# In[4]:
+# In[3]:
 
 
-
-# 隨機亂玩
-class dummy():
-    def __init__(self):
-        pass
-    def GetStep(self, board, is_black):
-        self.board = board
-        moves = self.Get_Valid_Moves(is_black)
-        if moves:
-            choice = random.randrange(len(moves))
-            return moves[choice]
-        else:
-            return None
-    # return set of possible moves
-    def Get_Valid_Moves(self, is_black):
-        moves = []
-        for row in range(HEIGHT):
-            for col in range(WIDTH):
-                if self.is_legal_move([row, col], is_black):
-                    moves.append([row, col])
-        return moves
-
-    def is_legal_move(self, step, is_black):
-        # determine whether an action from player is legal
-        (row, col) = step
-        # the position must be empty
-        if self.board[row][col] != EMPTY or self.board[row][col] == CORNER:
-            return False
-        
-        # inside 6x6
-        if row > 0 and row < 7        and col > 0 and col < 7:
-            return True
-        
-        # out of 8x8
-        if row < 0 or col < 0         or row > 7 or col > 7:
-            return False
-        
-        # edge placement: check flip rule is satisfied
-        who, opponent = (BLACK, WHITE) if is_black else (WHITE, BLACK)
-
-        for d in DIRECTIONS:
-            (row, col) = step
-            flip = False
-            for loop in range(7):
-                # move one step forward in Direction d
-                row += d[0]
-                col += d[1]
-
-                # out of bound
-                if row < 0 or col < 0                 or row > 7 or col > 7:
-                    break
-
-                if self.board[row][col] == EMPTY or self.board[row][col] == CORNER:
-                    break
-                if self.board[row][col] == who:
-                    if flip:
-                        # this edge placement is legal
-                        return True
-                    else:
-                        break
-                if self.board[row][col] == opponent:
-                    flip = True
-        return False
-
-
-# In[5]:
-
-
-import timeit
 
 def play_game():
     # 棋盤與玩家
@@ -195,7 +114,6 @@ def play_game():
     global white
     
     global error_encounter
-    global NO_ERROR
     
     # 記錄輸贏
     global blackwin
@@ -204,9 +122,11 @@ def play_game():
     
     global total_bscore
     global total_wscore
+    
     # black go first
     is_black = True
     pass_turn = False
+    NO_ERROR = True
     
     black.open_episode()
     white.open_episode()
@@ -277,18 +197,11 @@ def play_game():
     judger.ep += 1
 
 
-# In[9]:
+# In[4]:
 
 
 # to simulate game and do training
-
-from IPython.display import display, clear_output
-
-from td_agent import *
-from othello import *
-
-
-alpha = 1/(30*8*2)
+alpha = 0.1
 
 # black agent = 
 black = agent('black.p', 'black.p', 'black_tuple_agent', alpha, True) # load and save on 'black.p'
@@ -304,7 +217,7 @@ white.set_tuple(tuple_list, tuple_size)
 
 # Params
 # num of games to be played
-NUM_GAMES = 1000
+NUM_GAMES = 100
 
 # True: write every end game state to 'game_report.txt'
 __GAME_RECORD__ = False
@@ -313,7 +226,7 @@ __ERR_RECORD__ = True
 
 __SAVE_NET__ = True
 __BLACK_TRAIN__ = True
-__WHITE_TRAIN__ = False
+__WHITE_TRAIN__ = True
 
 
 # True: 黑白棋手每局對換身份, False：黑棋手永遠持黑棋
@@ -331,7 +244,6 @@ total_wscore = 0
 start = timeit.default_timer()
 for match in range(NUM_GAMES):
     judger.reset()
-    NO_ERROR = True
     
     play_game()
 
@@ -392,8 +304,11 @@ if __SAVE_NET__:
 print('DONE!', bcolors.ENDC)
 
 
-# In[ ]:
+# In[5]:
 
 
-
+for k in black.weight:
+    print(k)
+for k in white.weight:
+    print(k)
 

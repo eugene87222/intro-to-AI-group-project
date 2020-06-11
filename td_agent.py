@@ -26,7 +26,7 @@ def reward(board, is_black):
                 r += 1
             elif board[row][col] == opponent:
                 r -= 1
-    return r/60 # reward at [-1, 1]
+    return r
 # reinforcement learning with n-tuple network
 class agent():
     def __init__(self, load_file = None, save_file = None, name = 'Player', alpha = 0.5, init_weight = False):
@@ -46,7 +46,7 @@ class agent():
     def set_tuple(self, tuple_list, tuple_size):
         self.tuple_list = tuple_list
         
-        # init weight if need, else load weight from file
+        # init weight if need,else load weight from file
         if self.init_weight:
             self.weight = []
             # every tuple has its own set of weight
@@ -54,7 +54,7 @@ class agent():
                 # combination of single tuple at size = 3**size 
                 # init value at (-1, 1)
                 self.weight.append([random.uniform(-1, 1) for x in range(3**tuple_size)])
-        elif load_file:
+        elif self.load_file:
             self.load_network()
            
     # 旋轉盤面 順時針90度
@@ -66,14 +66,21 @@ class agent():
     def close_episode(self):
         self.epi = self.epi[::-1]
         err = self.alpha * (reward(self.epi[0], self.is_black))# self.value(self.epi[0]))
+        err /= 480
         self.update(self.epi[0], err)
         #print('endgame:', err)
+        
         for e in range(1, len(self.epi)):
             self.training(self.epi[e], self.epi[e-1])
     def training(self, before, after):
         # TD(0)
         # err += a*( (r+after) - before )
-        err = self.alpha * ((reward(after, self.is_black)+self.value(after) - self.value(before)))
+        err = self.alpha * (
+                (reward(after, self.is_black)-reward(before, self.is_black)) 
+                 + (self.value(after) - self.value(before))
+                )
+        err /= 480
+        #print('endgame', err)
         self.update(before, err)
     # update weight
     def update(self, board, err):
@@ -98,9 +105,9 @@ class agent():
     ##################################################################################
     def GetStep(self, board, is_black):
         # n tuple network
-        self.board = deepcopy(board)
-        choose_epi = None
+        self.board = (board)
         self.is_black = is_black
+        choose_epi = None
         
         moves = self.Get_Valid_Moves(is_black)
         if moves:
@@ -117,10 +124,10 @@ class agent():
                 elif val > max_val:
                     max_val = val
                     step = m
-                choose_epi = self.board
+                    choose_epi = self.board
         else:
             return None
-        self.epi.append(deepcopy(self.board))
+        self.epi.append(deepcopy(choose_epi))
         return step
     def value(self, board):
         val = 0
@@ -239,3 +246,71 @@ class agent():
                     flip_set.append([row, col])
                     flip = True
         return test_board
+
+    
+
+# 隨機亂玩
+class dummy():
+    def __init__(self):
+        pass
+    def GetStep(self, board, is_black):
+        self.board = board
+        moves = self.Get_Valid_Moves(is_black)
+        if moves:
+            choice = random.randrange(len(moves))
+            return moves[choice]
+        else:
+            return None
+    # return set of possible moves
+    def Get_Valid_Moves(self, is_black):
+        moves = []
+        for row in range(HEIGHT):
+            for col in range(WIDTH):
+                if self.is_legal_move([row, col], is_black):
+                    moves.append([row, col])
+        return moves
+
+    def is_legal_move(self, step, is_black):
+        # determine whether an action from player is legal
+        (row, col) = step
+        # the position must be empty
+        if self.board[row][col] != EMPTY or self.board[row][col] == CORNER:
+            return False
+        
+        # inside 6x6
+        if row > 0 and row < 7\
+        and col > 0 and col < 7:
+            return True
+        
+        # out of 8x8
+        if row < 0 or col < 0 \
+        or row > 7 or col > 7:
+            return False
+        
+        # edge placement: check flip rule is satisfied
+        who, opponent = (BLACK, WHITE) if is_black else (WHITE, BLACK)
+
+        for d in DIRECTIONS:
+            (row, col) = step
+            flip = False
+            for loop in range(7):
+                # move one step forward in Direction d
+                row += d[0]
+                col += d[1]
+
+                # out of bound
+                if row < 0 or col < 0 \
+                or row > 7 or col > 7:
+                    break
+
+                if self.board[row][col] == EMPTY or self.board[row][col] == CORNER:
+                    break
+                if self.board[row][col] == who:
+                    if flip:
+                        # this edge placement is legal
+                        return True
+                    else:
+                        break
+                if self.board[row][col] == opponent:
+                    flip = True
+        return False
