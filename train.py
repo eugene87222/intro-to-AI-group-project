@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[8]:
+# In[1]:
 
 
-import time
 from copy import deepcopy
 #import operator
 #import numpy as np
@@ -32,7 +31,7 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 
-# In[376]:
+# In[2]:
 
 
 # params
@@ -44,186 +43,21 @@ CORNER = -1
 alpha = 0.5
 
 
-# In[377]:
+# In[ ]:
 
 
-class Game:
-    def __init__(self):
-        # var to record game
-        self.all_games = []
-        self.whosturn = []
-        self.err = ''
-        self.ep = 0
-        self.game_score = []
-    def reset(self):
-        self.board = [[EMPTY for col in range(8)] for row in range(8)]
-        self.board[0][0] = CORNER
-        self.board[7][7] = CORNER
-        self.board[0][7] = CORNER
-        self.board[7][0] = CORNER
-        self.prev_step = (-1,-1)
-        self.is_black = None
-    
-    def place(self, step, is_black):
-        self.prev_step = step
-        self.is_black = is_black
-        
-        if self.is_legal_move(step, is_black):
-            # legal placement, just do it!
-            self.set_and_flip(step, is_black)
-            return True
-        else:
-            return False
-    def set_and_flip(self, step, is_black):
-        self.board[step[0]][step[1]] = BLACK if is_black else WHITE
-        
-        who, opponent = (BLACK, WHITE) if is_black else (WHITE, BLACK)
-        for d in DIRECTIONS:
-            (row, col) = step
-            flip = False
-            flip_set = []
-            for loop in range(7):
-                # move one step foward in Direction d
-                row += d[0]
-                col += d[1]
-                
-                # out of bound
-                if row < 0 or col < 0                 or row > 7 or col > 7:
-                    break
-
-                if self.board[row][col] == EMPTY or self.board[row][col] == CORNER:
-                    break
-                if self.board[row][col] == who:
-                    if flip:
-                        # this edge placement is legal
-                        for s in flip_set:
-                            r,c = s
-                            self.board[r][c] = who
-                        break
-                    else:
-                        break
-                if self.board[row][col] == opponent:
-                    flip_set.append([row, col])
-                    flip = True
-    def is_legal_move(self, step, is_black):
-        # determine whether an action from player is legal
-        (row, col) = step
-        # the position must be empty
-        if self.board[row][col] != EMPTY or self.board[row][col] == CORNER:
-            return False
-        
-        # inside 6x6
-        if row > 0 and row < 7        and col > 0 and col < 7:
-            return True
-        
-        # out of 8x8
-        if row < 0 or col < 0         or row > 7 or col > 7:
-            return False
-        
-        # edge placement: check flip rule is satisfied
-        who, opponent = (BLACK, WHITE) if is_black else (WHITE, BLACK)
-        for d in DIRECTIONS:
-            (row, col) = step
-            flip = False
-            
-            for loop in range(7):
-                # move one step foward in Direction d
-                row += d[0]
-                col += d[1]
-                
-                # out of bound
-                if row < 0 or col < 0                 or row > 7 or col > 7:
-                    break
-
-                if self.board[row][col] == EMPTY or self.board[row][col] == CORNER:
-                    break
-                if self.board[row][col] == who:
-                    if flip:
-                        # this edge placement is legal
-                        return True
-                    else:
-                        break
-                if self.board[row][col] == opponent:
-                    flip = True
-        return False
-    
-    # print board in prompt
-    def show(self):
-        print('============ episode:' ,self.ep+1 , '============', 
-              '# {}{}'.format(
-                              'B' if self.is_black else 'W',
-                              self.prev_step)
-                             )
-        for row in range(HEIGHT):
-            for col in range(WIDTH):
-                print('{:>4}'.format(self.board[row][col]), end='')
-            print('')
-            
-    # write every end game state into file 'game_report.txt'
-    def summary(self):
-        with open('game_report.txt', 'w') as fp:
-            for e in range(self.ep):
-                game = self.all_games[e]
-                score = self.game_score[e]
-                header = '============ episode ' + str(e+1) + ' ============ B:W-' +                          str(score[0]) + ':' + str(score[1]) + '\n'
-                fp.write(header)
-                for row in range(8):
-                    for col in range(8):
-                        fp.write('{:4}'.format(game[row][col]))
-                    fp.write('\n')
-    # store end game state
-    def save_match(self):
-        self.all_games.append(self.board)
-        #self.whosturn.append(is_black)
-    
-    # store error encounter in string 
-    def track_err(self, err='TLE', is_black=True, step=(-1,-1)):
-        t = time.localtime()
-        current_time = time.strftime("%H:%M:%S", t)
-        err_summary = 'Error: ' + err + ' on '
-        if is_black:
-            err_summary += 'black turns #'
-        else:
-            err_summary += 'white turns #'
-        err_summary += str(step) + '\n' +                         'time:' + current_time + '\n'
-        err_summary += '============ episode ' + str(self.ep+1) + ' ============\n'
-        for row in range(WIDTH):
-            for col in range(8):
-                err_summary += '{:4}'.format(self.board[row][col])
-            err_summary += '\n'
-        self.err += err_summary
-    
-    # write error encounter to file 'err_report.txt'
-    def err_summary(self):
-        with open('err_report.txt', 'w') as fp:
-            fp.write(self.err)
-    # Return True if determine there is at least one legal move for next player 
-    def Get_Valid_Moves(self, is_black):
-        for row in range(HEIGHT):
-            for col in range(WIDTH):
-                if self.is_legal_move([row, col], is_black):
-                    return True
-        return False
-    # agent's final score = #(belonging color stones)
-    def compute_score(self):
-        (bscore, wscore) = (0,0)
-        for row in range(HEIGHT):
-            for col in range(WIDTH):
-                if self.board[row][col] == BLACK:
-                    bscore += 1
-                elif self.board[row][col] == WHITE:
-                    wscore += 1
-        self.game_score.append([bscore, wscore])
-        return bscore, wscore
 
 
-# In[275]:
+
+# In[3]:
 
 
+ALL_N_TUPLE = 2
 # 從 pos 開始，把 n 個坐標 視作爲 一個tuple
 # n 決定 tuple 長度
 # d 決定 tuple 衍生方向
 # 回傳 list(整個 tuple 的所有坐標)
+
 def gen_tuple(pos=[0,0], n = ALL_N_TUPLE, d = SOUTH):
     tup_list = []
     for t in range(n):
@@ -251,14 +85,40 @@ def tuple_set_one():
         for n in node:
             tuple_list.append(gen_tuple(n, ALL_N_TUPLE, SOUTH))
             tuple_list.append(gen_tuple(n, ALL_N_TUPLE, SOUTHEAST))
-    return tuple_list
+    return tuple_list, ALL_N_TUPLE
+
+# all-3 tuple in reference
+def tuple_set_two():
+    # all-3 tuple
+    ALL_N_TUPLE = 3
+    
+    # 30 個 tuple 
+    tup_node = [[0,0] for i in range(3)]
+    tup_node[0] = [[x,0] for x in range(1,3)] # 1 2
+    tup_node[1] = [[x,1] for x in range(3)] # 0 1 2
+    tup_node[2] = [[x,2] for x in range(3)]
+    
+    
+    # SOUTH(下), SOUTHEAST（右下）
+    tuple_list = []
+    for node in tup_node:
+        for n in node:
+            tuple_list.append(gen_tuple(n, ALL_N_TUPLE, SOUTH))
+            
+    tup_node[0] = [[x,0] for x in range(1,6)] # 1 2 3 4 5
+    tup_node[1] = [[x,1] for x in range(1,5)] # 1 2 3 4 
+    tup_node[1] = [[x,1] for x in range(2,4)] # 2 3
+    for node in tup_node:
+        for n in node:
+            tuple_list.append(gen_tuple(n, ALL_N_TUPLE, SOUTHEAST))
+        
+    return tuple_list, ALL_N_TUPLE
 
 
-# In[472]:
+# In[4]:
 
 
-import pickle
-import random
+
 # 隨機亂玩
 class dummy():
     def __init__(self):
@@ -321,230 +181,13 @@ class dummy():
                 if self.board[row][col] == opponent:
                     flip = True
         return False
-def show(board):
-
-        for row in range(HEIGHT):
-            for col in range(WIDTH):
-                print('{:>4}'.format(board[row][col]), end='')
-            print('')
-def reward(board, is_black):
-    r = 0
-    who, opponent = (BLACK, WHITE) if is_black else (WHITE, BLACK)
-    for row in range(8):
-        for col in range(8):
-            if board[row][col] == who:
-                r += 1
-            elif board[row][col] == opponent:
-                r -= 1
-    return r/60 # reward at [-1, 1]
-# reinforcement learning with n-tuple network
-class agent():
-    def __init__(self, load_file = None, save_file = None, name = 'Player', alpha = 0.5):
-        self.load_file = load_file
-        self.save_file = save_file
-        self.name = name
-        self.alpha = alpha
-        if load_file:
-            self.load_network()
-    def save_network(self):
-        if self.save_file:
-            with open(self.save_file, 'wb') as fp:
-                pickle.dump(self.weight, fp, protocol=pickle.HIGHEST_PROTOCOL)
-    def load_network(self):
-        with open(self.load_file, 'rb') as fp:
-            self.weight = pickle.load(fp)
-    def set_tuple(self, tuple_list, tuple_size):
-        self.tuple_list = tuple_list
-        
-        # no init for weight if weight is loaded
-        if self.load_file:
-            return 0
-        
-        self.weight = []
-        # every tuple has its own set of weight
-        for i in range(len(tuple_list)):
-            # combination of single tuple at size = 3**size 
-            # init value at (-1, 1)
-            self.weight.append([random.uniform(-1, 1) for x in range(3**tuple_size)])
-    
-    # 旋轉盤面 順時針90度
-    def rotate(self, board):
-        return [list(r) for r in zip(*board[::-1])]
-    ##################################################################################
-    def open_episode(self):
-        self.epi = []
-    def close_episode(self):
-        self.epi = self.epi[::-1]
-        err = self.alpha * (- self.value(self.epi[0]))
-        self.update(self.epi[0], err)
-        print('endgame:', err)
-        for e in range(1, len(self.epi)):
-            self.training(self.epi[e], self.epi[e-1])
-    def training(self, before, after):
-        # TD(0)
-        # err += a*( (r+after) - before )
-        err = self.alpha * ((reward(after, self.is_black)+self.value(after) - self.value(before)))
-        self.update(before, err)
-    # update weight
-    def update(self, board, err):
-        tmp = deepcopy(board)
-        for loop in range(4):
-            # 水平面翻轉
-            flip_board = tmp[::-1]
-            
-            for idx in range(len(self.tuple_list)):
-                tup = self.tuple_list[idx]
-                key1 = 0
-                key2 = 0
-                fv = 1
-                for node in tup:
-                    key1 += (fv * tmp[node[0]][node[1]])
-                    key2 += (fv * flip_board[node[0]][node[1]])
-                    fv *= 3
-                # 通過 key 取得 weight
-                self.weight[idx][key1] += err
-                self.weight[idx][key2] += err
-            tmp = [list(r) for r in zip(*tmp[::-1])]
-    ##################################################################################
-    def GetStep(self, board, is_black):
-        # n tuple network
-        self.board = deepcopy(board)
-        self.epi.append(deepcopy(board))
-        self.is_black = is_black
-        
-        moves = self.Get_Valid_Moves(is_black)
-        (max_val, step) = (-9999, moves[0])
-        if moves:
-            for m in moves:
-                self.board = deepcopy(board)
-                self.board = self.set_and_flip(m, is_black)
-                val = self.value(self.board)
-                val += reward(self.board, is_black)
-                if val > max_val:
-                    max_val = val
-                    step = m
-        else:
-            return None
-        return step
-    def value(self, board):
-        val = 0
-        tmp = deepcopy(board)
-        # 旋轉盤面 4 次的 symmetric tuple
-        for loop in range(4):
-            
-            # 水平面翻轉
-            flip_board = tmp[::-1]
-            
-            for idx in range(len(self.tuple_list)):
-                tup = self.tuple_list[idx]
-                key1 = 0
-                key2 = 0
-                fv = 1
-                for node in tup:
-                    key1 += (fv * tmp[node[0]][node[1]])
-                    key2 += (fv * flip_board[node[0]][node[1]])
-                    fv *= 3
-                # 通過 key 取得 weight
-                val += self.weight[idx][key1]
-                val += self.weight[idx][key2]
-            # 旋轉clockwise 90°
-            tmp = [list(r) for r in zip(*tmp[::-1])]
-        return val
-    ##################################################################################
-    # return set of possible moves
-    def Get_Valid_Moves(self, is_black):
-        moves = []
-        for row in range(HEIGHT):
-            for col in range(WIDTH):
-                if self.is_legal_move([row, col], is_black):
-                    moves.append([row, col])
-        return moves
-
-    def is_legal_move(self, step, is_black):
-        # determine whether an action is legal
-        (row, col) = step
-        
-        # the position must be empty
-        if self.board[row][col] != EMPTY or self.board[row][col] == CORNER:
-            return False
-        
-        # inside 6x6
-        if row > 0 and row < 7        and col > 0 and col < 7:
-            return True
-        
-        # out of 8x8
-        if row < 0 or col < 0         or row > 7 or col > 7:
-            return False
-        
-        # edge placement: check flip rule is satisfied
-        who, opponent = (BLACK, WHITE) if is_black else (WHITE, BLACK)
-
-        for d in DIRECTIONS:
-            (row, col) = step
-            flip = False
-            for loop in range(7):
-                # move one step forward in Direction d
-                row += d[0]
-                col += d[1]
-
-                # out of bound
-                if row < 0 or col < 0                 or row > 7 or col > 7:
-                    break
-                
-                # who -> opponent(+) -> who ===> flip
-                if self.board[row][col] == EMPTY or self.board[row][col] == CORNER:
-                    break
-                if self.board[row][col] == who:
-                    if flip:
-                        # this edge placement is legal
-                        return True
-                    else:
-                        break
-                if self.board[row][col] == opponent:
-                    fli = [row,col]
-                    flip = True
-        return False
-    ##################################################################################
-    def set_and_flip(self, step, is_black):
-        test_board = deepcopy(self.board)
-        
-        test_board[step[0]][step[1]] = BLACK if is_black else WHITE
-        
-        who, opponent = (BLACK, WHITE) if is_black else (WHITE, BLACK)
-        for d in DIRECTIONS:
-            (row, col) = step
-            flip = False
-            flip_set = []
-            for loop in range(7):
-                # move one step foward in Direction d
-                row += d[0]
-                col += d[1]
-                
-                # out of bound
-                if row < 0 or col < 0                 or row > 7 or col > 7:
-                    break
-
-                if test_board[row][col] == EMPTY or test_board[row][col] == CORNER:
-                    break
-                if test_board[row][col] == who:
-                    if flip:
-                        # this edge placement is legal
-                        for s in flip_set:
-                            r,c = s
-                            test_board[r][c] = who
-                        break
-                    else:
-                        break
-                if test_board[row][col] == opponent:
-                    flip_set.append([row, col])
-                    flip = True
-        return test_board
 
 
-# In[475]:
+# In[5]:
 
 
 import timeit
+
 def play_game():
     # 棋盤與玩家
     global judger
@@ -566,7 +209,7 @@ def play_game():
     pass_turn = False
     
     black.open_episode()
-    #white.open_episode()
+    white.open_episode()
     
     while True:
         board = deepcopy(judger.board)
@@ -628,38 +271,43 @@ def play_game():
                 total_bscore += bscore
                 total_wscore += wscore
                 break
-                
-    black.close_episode()
-    #white.close_episode()
+    if NO_ERROR:
+        black.close_episode()
+        white.close_episode()
     judger.ep += 1
 
 
-# In[479]:
+# In[9]:
 
 
 # to simulate game and do training
 
 from IPython.display import display, clear_output
 
+from td_agent import *
+from othello import *
+
+
 alpha = 1/(30*8*2)
+
 # black agent = 
-black = agent('black.p', 'black.p', 'black_tuple_agent', alpha) # load and save on 'black.p'
-# tuple set for black agent
-tuple_list = tuple_set_one()
-black.set_tuple(tuple_list, 2)
+black = agent('black.p', 'black.p', 'black_tuple_agent', alpha, True) # load and save on 'black.p'
+# tuple set
+tuple_list, tuple_size = tuple_set_one()
+black.set_tuple(tuple_list, tuple_size)
 
 # white agent = 
-white = dummy()#agent(None, 'white.p', 'white_tuple_agent', alpha)
-# tuple set for white agent
-tuple_list = tuple_set_one()
-#white.set_tuple(tuple_list, 2)
+white = agent('white.p', 'white.p', 'white_tuple_agent', alpha, True)
+# tuple set 
+tuple_list, tuple_size = tuple_set_two()
+white.set_tuple(tuple_list, tuple_size)
 
 # Params
 # num of games to be played
-NUM_GAMES = 100
+NUM_GAMES = 1000
 
 # True: write every end game state to 'game_report.txt'
-__GAME_RECORD__ = True
+__GAME_RECORD__ = False
 # True: write any TLE or illegal move to 'err_report.txt'
 __ERR_RECORD__ = True
 
@@ -679,16 +327,13 @@ whitewin = 0
 draw = 0
 total_bscore = 0
 total_wscore = 0
+
 start = timeit.default_timer()
 for match in range(NUM_GAMES):
     judger.reset()
     NO_ERROR = True
     
     play_game()
-
-    if NO_ERROR:
-        # do backward training
-        pass
 
     if __GAME_RECORD__:
         judger.save_match()
@@ -745,4 +390,10 @@ if __SAVE_NET__:
         white.save_network()
     print('OK!')
 print('DONE!', bcolors.ENDC)
+
+
+# In[ ]:
+
+
+
 
