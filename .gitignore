@@ -2,6 +2,6 @@ __*
 *.exe
 Team_2.py
 Team_2.spec
-white.p
-black.p
+*.p
+*.txt
 */
