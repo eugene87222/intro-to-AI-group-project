@@ -65,6 +65,7 @@
 |ALGO = minimax<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.0<br/>WEIGHT_MOVE = 1.5|我方勝場：28<br/>平手：3<br/>我方勝率：70.0%<br/>對方勝率：22.5%|
 |ALGO = minimax<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.5<br/>WEIGHT_MOVE = 1.8|我方勝場：25<br/>平手：3<br/>我方勝率：62.5%<br/>對方勝率：30.0%|
 |ALGO = minimax<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 1.5<br/>WEIGHT_EDGE = 1.5<br/>WEIGHT_MOVE = 1.0|我方勝場：33<br/>平手：1<br/>我方勝率：82.5%<br/>對方勝率：15.0%|
+|ALGO = minimax<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 1.8<br/>WEIGHT_EDGE = 1.6<br/>WEIGHT_MOVE = 1.2|我方勝場：32<br/>平手：2<br/>我方勝率：80.0%<br/>對方勝率：15.0%|
 
 # TODO
 
