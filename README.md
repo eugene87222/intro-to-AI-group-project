@@ -52,6 +52,7 @@
 # Note
 
 > 每組跑 20 遍，共 40 場對局
+
 |參數|結果|
 |-|-|
 |ALGO = negamax<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.0<br/>WEIGHT_MOVE = 1.5|我方勝場：31<br/>平手：3<br/>我方勝率：77.5%<br/>對方勝率：15.0%|
