@@ -107,7 +107,7 @@ def tuple_set_two():
             
     tup_node[0] = [[x,0] for x in range(1,6)] # 1 2 3 4 5
     tup_node[1] = [[x,1] for x in range(1,5)] # 1 2 3 4 
-    tup_node[1] = [[x,1] for x in range(2,4)] # 2 3
+    tup_node[2] = [[x,1] for x in range(2,4)] # 2 3
     for node in tup_node:
         for n in node:
             tuple_list.append(gen_tuple(n, ALL_N_TUPLE, SOUTHEAST))
