@@ -65,7 +65,7 @@ class agent():
         self.epi = []
     def close_episode(self):
         self.epi = self.epi[::-1]
-        err = self.alpha * (-reward(self.epi[0], self.is_black))# self.value(self.epi[0]))
+        err = self.alpha * (reward(self.epi[0], self.is_black))# self.value(self.epi[0]))
         self.update(self.epi[0], err)
         #print('endgame:', err)
         for e in range(1, len(self.epi)):
