@@ -2,6 +2,8 @@ import STcpClient
 from math import sqrt
 from copy import deepcopy
 from datetime import datetime, timedelta
+import threading
+from queue import PriorityQueue
 
 '''
 ID : 2
@@ -323,6 +325,42 @@ class SearchingAgent():
                 break
         return best_move
 
+    def AlphaBetaBranch(self, board, is_black, moves, queue):
+        best_move = None
+        max_score = -INF
+        score = -INF
+        for move in moves:
+            new_board = self.PlaceAndFlip(board, move, is_black)
+            score = self.Min(new_board, not is_black, 0, max_score, INF)
+            if score > max_score:
+                max_score = score
+                best_move = move
+            if datetime.now() > self.lifetime:
+                print('moves 跑到一半')
+                break
+        queue.put((-max_score, best_move))
+
+    def AlphaBetaSpeedUp(self, board, is_black, thread_num):
+        Q = PriorityQueue()
+        threads = []
+        moves = self.GetValidMoves(board, is_black)
+        n = len(moves)
+        size = n//thread_num + 1
+        for i in range(n%thread_num):
+            start = i * size
+            _moves = moves[start:start+size]
+            threads.append(threading.Thread(target=self.AlphaBetaBranch, args=(board, is_black, _moves, Q)))
+            threads[-1].start()
+        size = n // thread_num
+        for i in range(n%thread_num, thread_num):
+            start = i * size
+            _moves = moves[start:start+size]
+            threads.append(threading.Thread(target=self.AlphaBetaBranch, args=(board, is_black, _moves, Q)))
+            threads[-1].start()
+        for i in range(thread_num):
+            threads[i].join()
+        return Q.get()[1]
+
     def Negamax(self, board, is_black, depth, alpha, beta):
         if depth>self.MAX_DEPTH or datetime.now()>self.lifetime:
             score = self.Evaluate(board, is_black)
@@ -385,7 +423,8 @@ class SearchingAgent():
         moves = self.GetValidMoves(board, is_black)
         self.MAX_DEPTH = round(sqrt(72//len(moves))+0.5)
         if self.ALGORITHM == 'minimax':
-            move = self.AlphaBetaPruning(board, is_black)
+            # move = self.AlphaBetaPruning(board, is_black)
+            move = self.AlphaBetaSpeedUp(board, is_black, 4)
         elif self.ALGORITHM == 'negamax':
             self.MAX_DEPTH += 1
             move = self.Negamax(board, is_black, 0, -INF, INF)
@@ -398,7 +437,7 @@ class SearchingAgent():
 
 
 def GetStep(board, is_black):
-    Brain = SearchingAgent(is_black, 4.97, 50.0, 10.0, 1.0, 'minimax')
+    Brain = SearchingAgent(is_black, 4.97, 50.0, 10.0, 1.0, 'pvs')
     return Brain.GetStep(board, is_black)
 
 
