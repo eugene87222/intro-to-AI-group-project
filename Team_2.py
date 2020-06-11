@@ -23,12 +23,17 @@ ID : 2
             r, c 表示要下棋子的座標位置 (row, column) (zero-base)
 '''
 
+pvs = 'pvs'
+negamax = 'negamax'
+minimax = 'minimax'
+ALGO = minimax
+
 INF = 1e10
 MAX_DEPTH = -1
-DURATION = 4.9
-WEIGHT_PIECE = 2.0
-WEIGHT_EDGE = 1.2
-WEIGHT_MOVE = 1.0
+DURATION = 4.96
+WEIGHT_PIECE = 1.8
+WEIGHT_EDGE = 1.6
+WEIGHT_MOVE = 1.2
 
 CORNER = -1
 EMPTY = 0
@@ -46,8 +51,7 @@ WEST = [0, -1]
 NORTHWEST = [-1, -1]
 DIRECTIONS = (NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH, SOUTHWEST, WEST, NORTHWEST)
 
-ROUND = -1
-HISTORY = {}
+PLAYER = -1
 
 
 def OutOfBoard(pos, direction):
@@ -278,37 +282,25 @@ def Evaluate(board, is_black):
                 # print(f'ERROR, unknown value at {board[r][c]}')
                 pass
     piece_score = 1 if player_piece>opponent_piece else 0 if player_piece==opponent_piece else -1
-    # piece_score = player_piece - opponent_piece
     edge_score = player_edge - opponent_edge
-    return piece_score*WEIGHT_PIECE + edge_score*WEIGHT_EDGE + len(moves)*WEIGHT_MOVE
-
-
-def Stringify(board, is_black):
-    board_str = ''.join([''.join(map(str, row)) for row in board])
-    if is_black:
-        return f'B{board_str}'
-    else:
-        return f'W{board_str}'
+    score = piece_score*WEIGHT_PIECE + edge_score*WEIGHT_EDGE + len(moves)*WEIGHT_MOVE
+    if PLAYER != is_black:
+        score *= -1
+    return score
 
 
 def Max(board, is_black, depth, lifetime, alpha, beta):
-    global HISTORY
-    board_str = Stringify(board, is_black)
-    if board_str in HISTORY:
-        return HISTORY[board_str]
     if depth>MAX_DEPTH or datetime.now()>lifetime:
         score = Evaluate(board, is_black)
-        HISTORY[board_str] = score
         return score
     next_moves = GetValidMoves(board, is_black)
     if len(next_moves) == 0:
         score = Evaluate(board, is_black)
-        HISTORY[board_str] = score
         return score
     v = -INF
     for move in next_moves:
         new_board = PlaceAndFlip(board, move, is_black)
-        v = max(v, Min(new_board, is_black, depth+1, lifetime, alpha, beta))
+        v = max(v, Min(new_board, not is_black, depth+1, lifetime, alpha, beta))
         if v >= beta:
             return v
         alpha = max(alpha, v)
@@ -316,23 +308,17 @@ def Max(board, is_black, depth, lifetime, alpha, beta):
 
 
 def Min(board, is_black, depth, lifetime, alpha, beta):
-    global HISTORY
-    board_str = Stringify(board, is_black)
-    if board_str in HISTORY:
-        return HISTORY[board_str]
     if depth>MAX_DEPTH or datetime.now()>lifetime:
         score = Evaluate(board, is_black)
-        HISTORY[board_str] = score
         return score
-    next_moves = GetValidMoves(board, not is_black)
+    next_moves = GetValidMoves(board, is_black)
     if len(next_moves) == 0:
         score = Evaluate(board, is_black)
-        HISTORY[board_str] = score
         return score
     v = INF
     for move in next_moves:
-        new_board = PlaceAndFlip(board, move, not is_black)
-        v = min(v, Max(new_board, is_black, depth+1, lifetime, alpha, beta))
+        new_board = PlaceAndFlip(board, move, is_black)
+        v = min(v, Max(new_board, not is_black, depth+1, lifetime, alpha, beta))
         if v <= alpha:
             return v
         beta = min(beta, v)
@@ -349,8 +335,8 @@ def AlphaBetaPruning(board, is_black, lifetime):
     MAX_DEPTH = round(sqrt(72//len(moves))+0.5)
     for move in moves:
         new_board = PlaceAndFlip(board, move, is_black)
-        score = Min(new_board, is_black, depth, lifetime, max_score ,INF)
-        if score >= max_score:
+        score = Min(new_board, not is_black, depth, lifetime, max_score ,INF)
+        if score > max_score:
             max_score = score
             best_move = move
         if datetime.now() > lifetime:
@@ -359,16 +345,82 @@ def AlphaBetaPruning(board, is_black, lifetime):
     return move
 
 
+def Negamax(board, is_black, depth, lifetime, alpha, beta):
+    if depth>MAX_DEPTH or datetime.now()>lifetime:
+        score = Evaluate(board, is_black)
+        return score
+    next_moves = GetValidMoves(board, is_black)
+    if len(next_moves) == 0:
+        score = Evaluate(board, is_black)
+        return score
+    v = -INF
+    best_move = None
+    for move in next_moves:
+        new_board = PlaceAndFlip(board, move, is_black)
+        score = -Negamax(new_board, not is_black, depth+1, lifetime, -beta, -alpha)
+        if score > v:
+            v = score
+            best_move = move
+        alpha = max(alpha, v)
+        if alpha >= beta:
+            break
+        if datetime.now() > lifetime:
+            # print('moves 跑到一半')
+            break
+    if depth == 0:
+        return best_move
+    else:
+        return v
+
+
+def PVS(board, is_black, depth, lifetime, alpha, beta):
+    if depth>MAX_DEPTH or datetime.now()>lifetime:
+        score = Evaluate(board, is_black)
+        return score
+    next_moves = GetValidMoves(board, is_black)
+    if len(next_moves) == 0:
+        score = Evaluate(board, is_black)
+        return score
+    best_move = None
+    for i, move in enumerate(next_moves):
+        new_board = PlaceAndFlip(board, move, is_black)
+        if i == 0:
+            score = -PVS(new_board, not is_black, depth+1, lifetime, -beta, -alpha)
+        else:
+            score = -PVS(new_board, not is_black, depth+1, lifetime, -alpha-1, -alpha)
+            if alpha<score and score<beta:
+                score = -PVS(new_board, not is_black, depth+1, lifetime, -beta, -score)
+        if score > alpha:
+            best_move = move
+            alpha = score
+        if alpha >= beta:
+            break
+        if datetime.now() > lifetime:
+            # print('moves 跑到一半')
+            break
+    if depth == 0:
+        return best_move
+    else:
+        return alpha
+
+
 def GetStep(board, is_black):
-    global ROUND, HISTORY
-    if ROUND == -1:
-        ROUND = is_black
-        HISTORY = {}
-    elif ROUND != is_black:
-        ROUND = is_black
-        HISTORY = {}
     lifetime = datetime.now() + timedelta(seconds=DURATION)
-    move = AlphaBetaPruning(board, is_black, lifetime)
+    global MAX_DEPTH, PLAYER
+    if PLAYER == -1:
+        PLAYER = is_black
+    elif PLAYER != is_black:
+        PLAYER = is_black
+    if ALGO == minimax:
+        move = AlphaBetaPruning(board, is_black, lifetime)
+    elif ALGO == negamax:
+        moves = GetValidMoves(board, is_black)
+        MAX_DEPTH = round(sqrt(72//len(moves))+0.5)
+        move = Negamax(board, is_black, 0, lifetime, -INF, INF)
+    else:
+        moves = GetValidMoves(board, is_black)
+        MAX_DEPTH = round(sqrt(72//len(moves))+0.5)
+        move = PVS(board, is_black, 0, lifetime, -INF, INF)
     return move
 
 

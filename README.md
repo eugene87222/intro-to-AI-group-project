@@ -40,9 +40,6 @@
     - number of total pieces
     - 權重比較請見 [Note](#Note)
 
-- `Stringify(board, is_black)`
-  - 把 `board` 裡面的所有值串成一個字串
-
 - `Max(board, is_black, depth, lifetime, alpha, beta)`
   - minimax 的 max
 
@@ -54,16 +51,20 @@
 
 # Note
 
-> 每組實驗跑 200 次，共 400 場對局
+> 每組跑 20 遍，共 40 場對局
 |參數|結果|
 |-|-|
-|DURATION = 4.9<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 0.5<br/>WEIGHT_MOVE = 1.0|我方勝場：298<br/>平手：17<br/>我方勝率：74.5%<br/>對方勝率：21.25%|
-|DURATION = 4.9<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 2.0<br/>WEIGHT_MOVE = 1.0|我方勝場：283<br/>平手：20<br/>我方勝率：70.75%<br/>對方勝率：24.25%|
-
-> 每組實驗跑 50 次，共 100 場對局
-|參數|結果|
-|-|-|
-|DURATION = 4.9<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.2<br/>WEIGHT_MOVE = 1.0|我方勝場：71<br/>平手：4<br/>我方勝率：71.0%<br/>對方勝率：25.0%|
+|ALGO = negamax<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.0<br/>WEIGHT_MOVE = 1.5|我方勝場：31<br/>平手：3<br/>我方勝率：77.5%<br/>對方勝率：15.0%|
+|ALGO = negamax<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.5<br/>WEIGHT_MOVE = 1.8|我方勝場：29<br/>平手：1<br/>我方勝率：72.5%<br/>對方勝率：25.0%|
+|ALGO = negamax<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 1.5<br/>WEIGHT_EDGE = 1.5<br/>WEIGHT_MOVE = 1.0|我方勝場：27<br/>平手：2<br/>我方勝率：67.5%<br/>對方勝率：27.5%|
+|ALGO = negamax<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 1.8<br/>WEIGHT_EDGE = 1.6<br/>WEIGHT_MOVE = 1.2|我方勝場：27<br/>平手：2<br/>我方勝率：67.5%<br/>對方勝率：27.5%|
+|ALGO = pvs<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.0<br/>WEIGHT_MOVE = 1.5|我方勝場：25<br/>平手：1<br/>我方勝率：62.5%<br/>對方勝率：35.0%|
+|ALGO = pvs<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.5<br/>WEIGHT_MOVE = 1.8|我方勝場：30<br/>平手：1<br/>我方勝率：75.0%<br/>對方勝率：22.5%|
+|ALGO = pvs<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 1.5<br/>WEIGHT_EDGE = 1.5<br/>WEIGHT_MOVE = 1.0|我方勝場：36<br/>平手：0<br/>我方勝率：90.0%<br/>對方勝率：10.0%|
+|ALGO = pvs<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 1.8<br/>WEIGHT_EDGE = 1.6<br/>WEIGHT_MOVE = 1.2|我方勝場：28<br/>平手：4<br/>我方勝率：70.0%<br/>對方勝率：20.0%|
+|ALGO = minimax<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.0<br/>WEIGHT_MOVE = 1.5|我方勝場：28<br/>平手：3<br/>我方勝率：70.0%<br/>對方勝率：22.5%|
+|ALGO = minimax<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.5<br/>WEIGHT_MOVE = 1.8|我方勝場：25<br/>平手：3<br/>我方勝率：62.5%<br/>對方勝率：30.0%|
+|ALGO = minimax<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 1.5<br/>WEIGHT_EDGE = 1.5<br/>WEIGHT_MOVE = 1.0|我方勝場：33<br/>平手：1<br/>我方勝率：82.5%<br/>對方勝率：15.0%|
 
 # TODO
 
@@ -79,4 +80,3 @@
 - [x] minimax algorithm
 - [x] alpha-beta pruning
 - [ ] 有沒有其他加速方式，讓搜尋深度可以加大
-  - [x] 把 evaluate 過的盤面存在 `HISTORY` 裡面，就不用重複搜尋
