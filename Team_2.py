@@ -2,8 +2,6 @@ import STcpClient
 from math import sqrt
 from copy import deepcopy
 from datetime import datetime, timedelta
-import threading
-from queue import PriorityQueue
 
 '''
 ID : 2
@@ -42,15 +40,14 @@ DIRECTIONS = (NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH, SOUTHWEST, WEST, NORTHWE
 
 
 class SearchingAgent():
-    def __init__(self, is_black, duration, weight_piece, weight_edge, weight_move, algorithm='pvs'):
+    def __init__(self, is_black, duration, weight_piece, weight_edge, weight_move):
         self.PLAYER = is_black
         self.MAX_DEPTH = -1
         self.DURATION = duration
         self.WEIGHT_PIECE = weight_piece
         self.WEIGHT_EDGE = weight_edge
         self.WEIGHT_MOVE = weight_move
-        self.ALGORITHM = algorithm
-        self.lifetime = None
+        self.LIFETIME = None
 
     def OutOfBoard(self, pos, direction):
         new_r = pos[0] + direction[0]
@@ -268,134 +265,23 @@ class SearchingAgent():
                 else:
                     # print(f'ERROR, unknown value at {board[r][c]}')
                     pass
-        piece_score = 1 if player_piece>opponent_piece else 0 if player_piece==opponent_piece else -1
-        edge_score = player_edge - opponent_edge
-        score = piece_score*self.WEIGHT_PIECE + edge_score*self.WEIGHT_EDGE + len(moves)*self.WEIGHT_MOVE
+        score = player_piece*self.WEIGHT_PIECE + player_edge*self.WEIGHT_EDGE + len(moves)*self.WEIGHT_MOVE
         if self.PLAYER != is_black:
             score *= -1
         return score
 
-    def Max(self, board, is_black, depth, alpha, beta):
-        if depth>self.MAX_DEPTH or datetime.now()>self.lifetime:
-            score = self.Evaluate(board, is_black)
-            return score
-        next_moves = self.GetValidMoves(board, is_black)
-        if len(next_moves) == 0:
-            score = self.Evaluate(board, is_black)
-            return score
-        v = -INF
-        for move in next_moves:
-            new_board = self.PlaceAndFlip(board, move, is_black)
-            v = max(v, self.Min(new_board, not is_black, depth+1, alpha, beta))
-            if v >= beta:
-                return v
-            alpha = max(alpha, v)
-        return v
-
-    def Min(self, board, is_black, depth, alpha, beta):
-        if depth>self.MAX_DEPTH or datetime.now()>self.lifetime:
-            score = self.Evaluate(board, is_black)
-            return score
-        next_moves = self.GetValidMoves(board, is_black)
-        if len(next_moves) == 0:
-            score = self.Evaluate(board, is_black)
-            return score
-        v = INF
-        for move in next_moves:
-            new_board = self.PlaceAndFlip(board, move, is_black)
-            v = min(v, self.Max(new_board, not is_black, depth+1, alpha, beta))
-            if v <= alpha:
-                return v
-            beta = min(beta, v)
-        return v
-
-    def AlphaBetaPruning(self, board, is_black):
-        best_move = None
-        max_score = -INF
-        score = -INF
-        moves = self.GetValidMoves(board, is_black)
-        for move in moves:
-            new_board = self.PlaceAndFlip(board, move, is_black)
-            score = self.Min(new_board, not is_black, 0, max_score, INF)
-            if score > max_score:
-                max_score = score
-                best_move = move
-            if datetime.now() > self.lifetime:
-                print('moves 跑到一半')
-                break
-        return best_move
-
-    def AlphaBetaBranch(self, board, is_black, moves, queue):
-        best_move = None
-        max_score = -INF
-        score = -INF
-        for move in moves:
-            new_board = self.PlaceAndFlip(board, move, is_black)
-            score = self.Min(new_board, not is_black, 0, max_score, INF)
-            if score > max_score:
-                max_score = score
-                best_move = move
-            if datetime.now() > self.lifetime:
-                print('moves 跑到一半')
-                break
-        queue.put((-max_score, best_move))
-
-    def AlphaBetaSpeedUp(self, board, is_black, thread_num):
-        Q = PriorityQueue()
-        threads = []
-        moves = self.GetValidMoves(board, is_black)
-        n = len(moves)
-        size = n//thread_num + 1
-        for i in range(n%thread_num):
-            start = i * size
-            _moves = moves[start:start+size]
-            threads.append(threading.Thread(target=self.AlphaBetaBranch, args=(board, is_black, _moves, Q)))
-            threads[-1].start()
-        size = n // thread_num
-        for i in range(n%thread_num, thread_num):
-            start = i * size
-            _moves = moves[start:start+size]
-            threads.append(threading.Thread(target=self.AlphaBetaBranch, args=(board, is_black, _moves, Q)))
-            threads[-1].start()
-        for i in range(thread_num):
-            threads[i].join()
-        return Q.get()[1]
-
-    def Negamax(self, board, is_black, depth, alpha, beta):
-        if depth>self.MAX_DEPTH or datetime.now()>self.lifetime:
-            score = self.Evaluate(board, is_black)
-            return score
-        next_moves = self.GetValidMoves(board, is_black)
-        if len(next_moves) == 0:
-            score = self.Evaluate(board, is_black)
-            return score
-        v = -INF
-        best_move = None
-        for move in next_moves:
-            new_board = self.PlaceAndFlip(board, move, is_black)
-            score = -self.Negamax(new_board, not is_black, depth+1, -beta, -alpha)
-            if score > v:
-                v = score
-                best_move = move
-            alpha = max(alpha, v)
-            if alpha >= beta:
-                break
-            if datetime.now() > self.lifetime:
-                print('moves 跑到一半')
-                break
-        if depth == 0:
-            return best_move
-        else:
-            return v
-
     def PVS(self, board, is_black, depth, alpha, beta):
-        if depth>self.MAX_DEPTH or datetime.now()>self.lifetime:
+        if depth>=self.MAX_DEPTH or datetime.now()>=self.LIFETIME:
             score = self.Evaluate(board, is_black)
             return score
         next_moves = self.GetValidMoves(board, is_black)
         if len(next_moves) == 0:
-            score = self.Evaluate(board, is_black)
-            return score
+            oppo_next_moves = self.GetValidMoves(board, not is_black)
+            if len(oppo_next_moves) == 0:
+                score = self.Evaluate(board, is_black)
+                return score
+            else:
+                return -self.PVS(board, not is_black, depth, -beta, -alpha)
         best_move = None
         for i, move in enumerate(next_moves):
             new_board = self.PlaceAndFlip(board, move, is_black)
@@ -410,34 +296,27 @@ class SearchingAgent():
                 alpha = score
             if alpha >= beta:
                 break
-            if datetime.now() > self.lifetime:
+            if datetime.now() >= self.LIFETIME:
                 print('moves 跑到一半')
                 break
         if depth == 0:
             return best_move
         else:
             return alpha
+    
+    def SetMaxDepth(self, board, is_black):
+        moves = self.GetValidMoves(board, is_black)
+        self.MAX_DEPTH = round(sqrt(72//len(moves))+0.5) + 1
 
     def GetStep(self, board, is_black):
-        self.lifetime = datetime.now() + timedelta(seconds=self.DURATION)
-        moves = self.GetValidMoves(board, is_black)
-        self.MAX_DEPTH = round(sqrt(72//len(moves))+0.5)
-        if self.ALGORITHM == 'minimax':
-            move = self.AlphaBetaPruning(board, is_black)
-            # move = self.AlphaBetaSpeedUp(board, is_black, 4)
-        elif self.ALGORITHM == 'negamax':
-            self.MAX_DEPTH += 1
-            move = self.Negamax(board, is_black, 0, -INF, INF)
-        elif self.ALGORITHM == 'pvs':
-            self.MAX_DEPTH += 1
-            move = self.PVS(board, is_black, 0, -INF, INF)
-        else:
-            move = (0, 0)
+        self.LIFETIME = datetime.now() + timedelta(seconds=self.DURATION)
+        self.SetMaxDepth(board, is_black)        
+        move = self.PVS(board, is_black, 0, -INF, INF)
         return move
 
 
 def GetStep(board, is_black):
-    Brain = SearchingAgent(is_black, 4.97, 10.0, 1.0, 5.0, 'minimax')
+    Brain = SearchingAgent(is_black, 4.98, 1.0, 100.0, 10.0)
     return Brain.GetStep(board, is_black)
 
 
