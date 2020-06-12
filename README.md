@@ -62,6 +62,8 @@
 > 每組跑 50 遍，共 100 場對局
 > 對於相同 score 的 move -> 隨機挑一個
 
+|參數|結果|
+|-|-|
 |DURATION = 4.98<br/>WEIGHT_PIECE = 0.1<br/>WEIGHT_EDGE = 100.0<br/>WEIGHT_MOVE = 10.0|我方勝場：57<br/>平手：3<br/>我方勝率：57.0%<br/>對方勝率：40.0%|
 
 # TODO
