@@ -423,8 +423,8 @@ class SearchingAgent():
         moves = self.GetValidMoves(board, is_black)
         self.MAX_DEPTH = round(sqrt(72//len(moves))+0.5)
         if self.ALGORITHM == 'minimax':
-            # move = self.AlphaBetaPruning(board, is_black)
-            move = self.AlphaBetaSpeedUp(board, is_black, 4)
+            move = self.AlphaBetaPruning(board, is_black)
+            # move = self.AlphaBetaSpeedUp(board, is_black, 4)
         elif self.ALGORITHM == 'negamax':
             self.MAX_DEPTH += 1
             move = self.Negamax(board, is_black, 0, -INF, INF)
@@ -437,7 +437,7 @@ class SearchingAgent():
 
 
 def GetStep(board, is_black):
-    Brain = SearchingAgent(is_black, 4.97, 50.0, 10.0, 1.0, 'pvs')
+    Brain = SearchingAgent(is_black, 4.97, 10.0, 1.0, 5.0, 'minimax')
     return Brain.GetStep(board, is_black)
 
 

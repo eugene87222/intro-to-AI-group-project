@@ -55,18 +55,24 @@
 
 |參數|結果|
 |-|-|
-|ALGO = negamax<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.0<br/>WEIGHT_MOVE = 1.5|我方勝場：31<br/>平手：3<br/>我方勝率：77.5%<br/>對方勝率：15.0%|
-|ALGO = negamax<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.5<br/>WEIGHT_MOVE = 1.8|我方勝場：29<br/>平手：1<br/>我方勝率：72.5%<br/>對方勝率：25.0%|
-|ALGO = negamax<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 1.5<br/>WEIGHT_EDGE = 1.5<br/>WEIGHT_MOVE = 1.0|我方勝場：27<br/>平手：2<br/>我方勝率：67.5%<br/>對方勝率：27.5%|
-|ALGO = negamax<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 1.8<br/>WEIGHT_EDGE = 1.6<br/>WEIGHT_MOVE = 1.2|我方勝場：27<br/>平手：2<br/>我方勝率：67.5%<br/>對方勝率：27.5%|
-|ALGO = pvs<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.0<br/>WEIGHT_MOVE = 1.5|我方勝場：25<br/>平手：1<br/>我方勝率：62.5%<br/>對方勝率：35.0%|
-|ALGO = pvs<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.5<br/>WEIGHT_MOVE = 1.8|我方勝場：30<br/>平手：1<br/>我方勝率：75.0%<br/>對方勝率：22.5%|
-|ALGO = pvs<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 1.5<br/>WEIGHT_EDGE = 1.5<br/>WEIGHT_MOVE = 1.0|我方勝場：36<br/>平手：0<br/>我方勝率：90.0%<br/>對方勝率：10.0%|
-|ALGO = pvs<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 1.8<br/>WEIGHT_EDGE = 1.6<br/>WEIGHT_MOVE = 1.2|我方勝場：28<br/>平手：4<br/>我方勝率：70.0%<br/>對方勝率：20.0%|
-|ALGO = minimax<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.0<br/>WEIGHT_MOVE = 1.5|我方勝場：28<br/>平手：3<br/>我方勝率：70.0%<br/>對方勝率：22.5%|
-|ALGO = minimax<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 2.0<br/>WEIGHT_EDGE = 1.5<br/>WEIGHT_MOVE = 1.8|我方勝場：25<br/>平手：3<br/>我方勝率：62.5%<br/>對方勝率：30.0%|
-|ALGO = minimax<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 1.5<br/>WEIGHT_EDGE = 1.5<br/>WEIGHT_MOVE = 1.0|我方勝場：33<br/>平手：1<br/>我方勝率：82.5%<br/>對方勝率：15.0%|
-|ALGO = minimax<br/>DURATION = 4.96<br/>WEIGHT_PIECE = 1.8<br/>WEIGHT_EDGE = 1.6<br/>WEIGHT_MOVE = 1.2|我方勝場：32<br/>平手：2<br/>我方勝率：80.0%<br/>對方勝率：15.0%|
+|ALGO = negamax<br/>DURATION = 4.97<br/>WEIGHT_PIECE = 50.0<br/>WEIGHT_EDGE = 10.0<br/>WEIGHT_MOVE = 1.0|我方勝場：29<br/>平手：0<br/>我方勝率：72.5%<br/>對方勝率：27.5%|
+|ALGO = negamax<br/>DURATION = 4.97<br/>WEIGHT_PIECE = 50.0<br/>WEIGHT_EDGE = 5.0<br/>WEIGHT_MOVE = 1.0|我方勝場：30<br/>平手：3<br/>我方勝率：75.0%<br/>對方勝率：17.5%|
+|ALGO = negamax<br/>DURATION = 4.97<br/>WEIGHT_PIECE = 10.0<br/>WEIGHT_EDGE = 5.0<br/>WEIGHT_MOVE = 1.0|我方勝場：23<br/>平手：4<br/>我方勝率：57.5%<br/>對方勝率：32.5%|
+|ALGO = negamax<br/>DURATION = 4.97<br/>WEIGHT_PIECE = 50.0<br/>WEIGHT_EDGE = 1.0<br/>WEIGHT_MOVE = 10.0|我方勝場：31<br/>平手：1<br/>我方勝率：77.5%<br/>對方勝率：20.0%|
+|ALGO = negamax<br/>DURATION = 4.97<br/>WEIGHT_PIECE = 50.0<br/>WEIGHT_EDGE = 1.0<br/>WEIGHT_MOVE = 5.0|我方勝場：27<br/>平手：1<br/>我方勝率：67.5%<br/>對方勝率：30.0%|
+|ALGO = negamax<br/>DURATION = 4.97<br/>WEIGHT_PIECE = 10.0<br/>WEIGHT_EDGE = 1.0<br/>WEIGHT_MOVE = 5.0|我方勝場：30<br/>平手：1<br/>我方勝率：75.0%<br/>對方勝率：22.5%|
+|ALGO = pvs<br/>DURATION = 4.97<br/>WEIGHT_PIECE = 50.0<br/>WEIGHT_EDGE = 10.0<br/>WEIGHT_MOVE = 1.0|我方勝場：31<br/>平手：1<br/>我方勝率：77.5%<br/>對方勝率：20.0%|
+|ALGO = pvs<br/>DURATION = 4.97<br/>WEIGHT_PIECE = 50.0<br/>WEIGHT_EDGE = 5.0<br/>WEIGHT_MOVE = 1.0|我方勝場：32<br/>平手：0<br/>我方勝率：80.0%<br/>對方勝率：20.0%|
+|ALGO = pvs<br/>DURATION = 4.97<br/>WEIGHT_PIECE = 10.0<br/>WEIGHT_EDGE = 5.0<br/>WEIGHT_MOVE = 1.0|我方勝場：31<br/>平手：1<br/>我方勝率：77.5%<br/>對方勝率：20.0%|
+|ALGO = pvs<br/>DURATION = 4.97<br/>WEIGHT_PIECE = 50.0<br/>WEIGHT_EDGE = 1.0<br/>WEIGHT_MOVE = 10.0|我方勝場：31<br/>平手：3<br/>我方勝率：77.5%<br/>對方勝率：15.0%|
+|ALGO = pvs<br/>DURATION = 4.97<br/>WEIGHT_PIECE = 50.0<br/>WEIGHT_EDGE = 1.0<br/>WEIGHT_MOVE = 5.0|我方勝場：29<br/>平手：3<br/>我方勝率：72.5%<br/>對方勝率：20.0%|
+|ALGO = pvs<br/>DURATION = 4.97<br/>WEIGHT_PIECE = 10.0<br/>WEIGHT_EDGE = 1.0<br/>WEIGHT_MOVE = 5.0|我方勝場：31<br/>平手：1<br/>我方勝率：77.5%<br/>對方勝率：20.0%|
+|ALGO = minimax<br/>DURATION = 4.97<br/>WEIGHT_PIECE = 50.0<br/>WEIGHT_EDGE = 10.0<br/>WEIGHT_MOVE = 1.0|我方勝場：34<br/>平手：2<br/>我方勝率：85.0%<br/>對方勝率：10.0%|
+|ALGO = minimax<br/>DURATION = 4.97<br/>WEIGHT_PIECE = 50.0<br/>WEIGHT_EDGE = 5.0<br/>WEIGHT_MOVE = 1.0|我方勝場：31<br/>平手：2<br/>我方勝率：77.5%<br/>對方勝率：17.5%|
+|ALGO = minimax<br/>DURATION = 4.97<br/>WEIGHT_PIECE = 10.0<br/>WEIGHT_EDGE = 5.0<br/>WEIGHT_MOVE = 1.0|我方勝場：38<br/>平手：1<br/>我方勝率：95.0%<br/>對方勝率：2.5%|
+|ALGO = minimax<br/>DURATION = 4.97<br/>WEIGHT_PIECE = 50.0<br/>WEIGHT_EDGE = 1.0<br/>WEIGHT_MOVE = 10.0|我方勝場：39<br/>平手：0<br/>我方勝率：97.5%<br/>對方勝率：2.5%|
+|ALGO = minimax<br/>DURATION = 4.97<br/>WEIGHT_PIECE = 50.0<br/>WEIGHT_EDGE = 1.0<br/>WEIGHT_MOVE = 5.0|我方勝場：38<br/>平手：0<br/>我方勝率：95.0%<br/>對方勝率：5.0%|
+|ALGO = minimax<br/>DURATION = 4.97<br/>WEIGHT_PIECE = 10.0<br/>WEIGHT_EDGE = 1.0<br/>WEIGHT_MOVE = 5.0|我方勝場：35<br/>平手：1<br/>我方勝率：87.5%<br/>對方勝率：10.0%|
 
 # TODO
 
