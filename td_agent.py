@@ -99,8 +99,15 @@ class agent():
                 key2 = 0
                 fv = 1
                 for node in tup:
-                    key1 += (fv * tmp[node[0]][node[1]])
-                    key2 += (fv * flip_board[node[0]][node[1]])
+                    if self.is_black:
+                        # negate the board
+                        chess1 = NegateChess.get(tmp[node[0]][node[1]])
+                        chess2 = NegateChess.get(flip_board[node[0]][node[1]])
+                        key1 += (fv * chess1)
+                        key2 += (fv * chess2)
+                    else:
+                        key1 += (fv * tmp[node[0]][node[1]])
+                        key2 += (fv * flip_board[node[0]][node[1]])
                     fv *= 3
                 # 通過 key 取得 weight
                 self.weight[idx][key1] += err
