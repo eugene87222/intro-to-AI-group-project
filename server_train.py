@@ -153,50 +153,10 @@ draw = 0
 total_bscore = 0
 total_wscore = 0
 
-start = timeit.default_timer()
-for match in range(NUM_GAMES):
-    judger.reset()
-    
-    play_game()
 
-    if __GAME_RECORD__:
-        judger.save_match()
-    
-    # brief summary
-    if True or match%50 == 0:
-        print('black', ' wins:', blackwin )
-        print('white', ' wins:', whitewin)
-        print('A Tie:', draw)
-        print('in total score, B:W', total_bscore, '-',total_wscore)
-        #judger.show()
 
-end = timeit.default_timer()
 
-print('========== END ==========')
-print('Total Game Played:', NUM_GAMES)
-print('black', ' wins:', blackwin )
-print('white', ' wins:', whitewin)
-print('A Tie:', draw)
-print('Time Taken:', end-start)
 
-if __GAME_RECORD__:
-    print('Game Summary...', end='')
-    judger.summary()
-    print('OK!')
-if error_encounter:
-    print('Error(s) encounter:', error_encounter)
-    if __ERR_RECORD__:
-        print('Error Summary...', end='')
-        judger.err_summary()
-        print('OK!')
-if __SAVE_NET__:
-    print('Saving Weight...', end='')
-    if __BLACK_TRAIN__:
-        black.save_network()
-    if __WHITE_TRAIN__:
-        white.save_network()
-    print('OK!')
-print('DONE!')
 
 ###############################################################################
 def play_game():
@@ -301,3 +261,49 @@ def play_game():
     judger.ep += 1
 
 #############################################################################
+start = timeit.default_timer()
+for match in range(NUM_GAMES):
+    judger.reset()
+    
+    play_game()
+
+    if __GAME_RECORD__:
+        judger.save_match()
+    
+    # brief summary
+    if True or match%50 == 0:
+        print('black', ' wins:', blackwin )
+        print('white', ' wins:', whitewin)
+        print('A Tie:', draw)
+        print('in total score, B:W', total_bscore, '-',total_wscore)
+        #judger.show()
+
+end = timeit.default_timer()
+
+print('========== END ==========')
+print('Total Game Played:', NUM_GAMES)
+print('black', ' wins:', blackwin )
+print('white', ' wins:', whitewin)
+print('A Tie:', draw)
+print('Time Taken:', end-start)
+
+if __GAME_RECORD__:
+    print('Game Summary...', end='')
+    judger.summary()
+    print('OK!')
+if error_encounter:
+    print('Error(s) encounter:', error_encounter)
+    if __ERR_RECORD__:
+        print('Error Summary...', end='')
+        judger.err_summary()
+        print('OK!')
+if __SAVE_NET__:
+    print('Saving Weight...', end='')
+    if __BLACK_TRAIN__:
+        black.save_network()
+    if __WHITE_TRAIN__:
+        white.save_network()
+    print('OK!')
+print('DONE!')
+
+
