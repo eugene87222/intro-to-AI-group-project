@@ -287,7 +287,7 @@ for match in range(NUM_GAMES):
         print('black', ' wins:', blackwin )
         print('white', ' wins:', whitewin)
         print('A Tie:', draw)
-        print('B:W', total_bscore, '-',total_wscore)
+        print('in total score, B:W', total_bscore, '-',total_wscore)
         #judger.show()
 
 end = timeit.default_timer()

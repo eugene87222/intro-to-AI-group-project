@@ -307,7 +307,7 @@ class SearchingAgent():
             if alpha >= beta:
                 break
             if datetime.now() >= self.LIFETIME:
-                print('moves 跑到一半')
+#print('moves 跑到一半')
                 break
         if depth == 0:
             # return best_move
