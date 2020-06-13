@@ -65,10 +65,9 @@ class agent():
         self.epi = []
     def close_episode(self):
         self.epi = self.epi[::-1]
-        err = self.alpha * (reward(self.epi[0], self.is_black))# self.value(self.epi[0]))
+        err = self.alpha * (reward(self.epi[0], self.is_black) - self.value(self.epi[0]) )
         err /= 480
         self.update(self.epi[0], err)
-        #print('endgame:', err)
         
         for e in range(1, len(self.epi)):
             self.training(self.epi[e], self.epi[e-1])
@@ -76,11 +75,10 @@ class agent():
         # TD(0)
         # err += a*( (r+after) - before )
         err = self.alpha * (
-                (reward(after, self.is_black)-reward(before, self.is_black)) 
+                (reward(after, self.is_black)) 
                  + (self.value(after) - self.value(before))
                 )
         err /= 480
-        #print('endgame', err)
         self.update(before, err)
     # update weight
     def update(self, board, err):

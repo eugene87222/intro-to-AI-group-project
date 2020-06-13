@@ -10,6 +10,7 @@ from copy import deepcopy
 
 from td_agent import *
 from othello import *
+from Team_2_class import *
 
 WIDTH, HEIGHT = 8, 8
 NORTH = [-1, 0]
@@ -57,7 +58,8 @@ def gen_tuple(pos=[0,0], n = 0, d = SOUTH):
 
 # 30 of all-2 tuple
 def tuple_set_one():
-    # 2 tuple
+    # custom first version all-2 tuple
+    # performance seems bad in first 300 episode, stop using
     ALL_N_TUPLE = 2
     
     # 30 個 tuple
@@ -77,7 +79,7 @@ def tuple_set_one():
 
 # all-3 tuple in reference
 def tuple_set_two():
-    # all-3 tuple
+    # all-3 tuple of reference
     ALL_N_TUPLE = 3
     
     # 30 個 tuple 
@@ -101,6 +103,41 @@ def tuple_set_two():
             tuple_list.append(gen_tuple(n, ALL_N_TUPLE, SOUTHEAST))
         
     return tuple_list, ALL_N_TUPLE
+def tuple_set_three():
+    # all-2 tuple based on all-3 tuple of reference
+    ALL_N_TUPLE = 2
+    
+    # 30 個 tuple 
+    tup_node = [[0,0] for i in range(3)]
+    tup_node[0] = [[x,0] for x in range(1,3)] # 1 2
+    tup_node[1] = [[x,1] for x in range(3)] # 0 1 2
+    tup_node[2] = [[x,2] for x in range(3)]
+    
+    
+    # SOUTH(下), SOUTHEAST（右下）
+    tuple_list = []
+    for node in tup_node:
+        for n in node:
+            tuple_list.append(gen_tuple(n, ALL_N_TUPLE, SOUTH))
+            
+    tup_node[0] = [[x,0] for x in range(1,6)] # 1 2 3 4 5
+    tup_node[1] = [[x,1] for x in range(1,5)] # 1 2 3 4 
+    tup_node[2] = [[x,1] for x in range(2,4)] # 2 3
+    for node in tup_node:
+        for n in node:
+            tuple_list.append(gen_tuple(n, ALL_N_TUPLE, SOUTHEAST))
+        
+    return tuple_list, ALL_N_TUPLE
+def tuple_set_four():
+    ALL_N_TUPLE = 15
+    
+    tuple_list = []
+    for row in range(4):
+        for col in range(4):
+            if row == 0 and col == 0:
+                continue
+            tuple_list.append([row, col])
+    return [tuple_list], ALL_N_TUPLE
 
 
 # In[3]:
@@ -128,7 +165,9 @@ def play_game():
     pass_turn = False
     NO_ERROR = True
     
-    black.open_episode()
+    if __BLACK_TRAIN__:
+        black.open_episode()
+    #if __WHITE_TRAIN__:
     white.open_episode()
     
     while True:
@@ -142,7 +181,7 @@ def play_game():
             # white player turn
             step = white.GetStep(board, is_black)
         end = timeit.default_timer()
-
+        
         # no legal move at agent's perspective
         if step is None:
             who = 'BLACK' if is_black else 'WHITE'
@@ -192,8 +231,10 @@ def play_game():
                 total_wscore += wscore
                 break
     if NO_ERROR:
-        black.close_episode()
-        white.close_episode()
+        if __BLACK_TRAIN__:
+            black.close_episode()
+        if __WHITE_TRAIN__:
+            white.close_episode()
     judger.ep += 1
 
 
@@ -204,20 +245,24 @@ def play_game():
 alpha = 0.1
 
 # black agent = 
-black = agent('black.p', 'black.p', 'black_tuple_agent', alpha, True) # load and save on 'black.p'
+black = SearchingAgent(True, 4.9 , 2.0, 1.0, 1.5, algo='pvs')
+init_weight = False
+
+#black = agent('black_all_3.p', 'black_all_3.p', 'black_all_3', alpha, init_weight) # load and save on 'black.p'
 # tuple set
-tuple_list, tuple_size = tuple_set_one()
-black.set_tuple(tuple_list, tuple_size)
+tuple_list, tuple_size = tuple_set_two()
+#black.set_tuple(tuple_list, tuple_size)
+
 
 # white agent = 
-white = agent('white.p', 'white.p', 'white_tuple_agent', alpha, True)
+white = agent('all_3.p', 'all_3.p', 'all_3_agent', alpha, init_weight)
 # tuple set 
 tuple_list, tuple_size = tuple_set_two()
 white.set_tuple(tuple_list, tuple_size)
 
 # Params
 # num of games to be played
-NUM_GAMES = 100
+NUM_GAMES = 100000
 
 # True: write every end game state to 'game_report.txt'
 __GAME_RECORD__ = False
@@ -225,7 +270,7 @@ __GAME_RECORD__ = False
 __ERR_RECORD__ = True
 
 __SAVE_NET__ = True
-__BLACK_TRAIN__ = True
+__BLACK_TRAIN__ = False
 __WHITE_TRAIN__ = True
 
 
@@ -253,7 +298,7 @@ for match in range(NUM_GAMES):
     # brief summary
     if True or match%50 == 0:
         clear_output(wait=True)
-        print(black.name, ' wins:', blackwin )
+        print('black', ' wins:', blackwin )
         print('white', ' wins:', whitewin)
         print('A Tie:', draw)
         judger.show()
@@ -276,7 +321,7 @@ end = timeit.default_timer()
 print(bcolors.OKGREEN)
 print('========== END ==========')
 print('Total Game Played:', NUM_GAMES)
-print(black.name, ' wins:', blackwin )
+print('black', ' wins:', blackwin )
 print('white', ' wins:', whitewin)
 print('A Tie:', draw)
 print('B:W', total_bscore, '-',total_wscore)
@@ -304,11 +349,14 @@ if __SAVE_NET__:
 print('DONE!', bcolors.ENDC)
 
 
-# In[5]:
+# In[ ]:
 
 
-for k in black.weight:
-    print(k)
-for k in white.weight:
-    print(k)
+#print(white.weight)
+
+
+# In[ ]:
+
+
+#judger.show()
 
