@@ -1,5 +1,5 @@
 import random
-import STcpClient
+#import STcpClient
 from math import sqrt
 from copy import deepcopy
 from datetime import datetime, timedelta

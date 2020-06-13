@@ -228,21 +228,21 @@ alpha = 0.1
 init_weight = False
 
 # =========================BLACK==================================
-black = SearchingAgent(True, 4.99, 1, 100, 25, random_pick=True)
+black = SearchingAgent(True, 10, 1, 100, 25, random_pick=True)
 
 #black = agent('black_all_3.p', 'black_all_3.p', 'black_all_3', alpha, init_weight) # load and save on 'black.p'
 # tuple set
-tuple_list, tuple_size = tuple_set_two()
+#tuple_list, tuple_size = tuple_set_two()
 #black.set_tuple(tuple_list, tuple_size)
 
 # =========================WHITE==================================
-white = agent('all_3_30000.p', None, 'name', alpha, init_weight)
+white = agent('all_3_SA.p', 'all_3_SA_DEPTH=3.p', 'name', alpha, init_weight)
 # tuple set 
 tuple_list, tuple_size = tuple_set_two()
 white.set_tuple(tuple_list, tuple_size)
 
 __BLACK_TRAIN__ = False
-__WHITE_TRAIN__ = False
+__WHITE_TRAIN__ = True
 __SAVE_NET__ = __WHITE_TRAIN__ or __BLACK_TRAIN__
 
 # num of games to be played
