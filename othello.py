@@ -1,4 +1,5 @@
 from copy import deepcopy
+import time
 WIDTH, HEIGHT = 8, 8
 NORTH = [-1, 0]
 NORTHEAST = [-1, 1]
