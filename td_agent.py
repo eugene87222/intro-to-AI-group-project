@@ -227,7 +227,6 @@ class agent():
                     break
                 if self.board[row][col] == who:
                     if flip:
-                        # this edge placement is legal
                         return True
                     else:
                         break
