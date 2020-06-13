@@ -17,6 +17,12 @@ BLACK = 1
 EMPTY = 0
 CORNER = -1
 
+NegateChess = { BLACK: WHITE,
+           WHITE: BLACK,
+           CORNER: CORNER,
+           EMPTY: EMPTY
+          }
+
 def reward(board, is_black):
     r = 0
     who, opponent = (BLACK, WHITE) if is_black else (WHITE, BLACK)
@@ -130,6 +136,7 @@ class agent():
     def value(self, board):
         val = 0
         tmp = deepcopy(board)
+        
         # 旋轉盤面 4 次的 symmetric tuple
         for loop in range(4):
             
@@ -142,8 +149,15 @@ class agent():
                 key2 = 0
                 fv = 1
                 for node in tup:
-                    key1 += (fv * tmp[node[0]][node[1]])
-                    key2 += (fv * flip_board[node[0]][node[1]])
+                    if self.is_black:
+                        # negate the board
+                        chess1 = NegateChess.get(tmp[node[0]][node[1]])
+                        chess2 = NegateChess.get(flip_board[node[0]][node[1]])
+                        key1 += (fv * chess1)
+                        key2 += (fv * chess2)
+                    else:
+                        key1 += (fv * tmp[node[0]][node[1]])
+                        key2 += (fv * flip_board[node[0]][node[1]])
                     fv *= 3
                 # 通過 key 取得 weight
                 val += self.weight[idx][key1]
