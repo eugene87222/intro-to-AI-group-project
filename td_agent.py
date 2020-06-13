@@ -17,12 +17,6 @@ BLACK = 1
 EMPTY = 0
 CORNER = -1
 
-NegateChess = { BLACK: WHITE,
-           WHITE: BLACK,
-           CORNER: CORNER,
-           EMPTY: EMPTY
-          }
-
 def reward(board, is_black):
     r = 0
     who, opponent = (BLACK, WHITE) if is_black else (WHITE, BLACK)
@@ -35,33 +29,51 @@ def reward(board, is_black):
     return r
 # reinforcement learning with n-tuple network
 class agent():
-    def __init__(self, load_file = None, save_file = None, name = 'Player', alpha = 0.5, init_weight = False):
-        self.load_file = load_file
-        self.save_file = save_file
-        self.name = name
+    def __init__(self, 
+                 black_load = None, 
+                 black_save = None,
+                 white_load = None,
+                 white_save = None,
+                 alpha = 0.1, 
+                 init_weight = False):
+        self.black_load = black_load
+        self.white_load = white_load
+        
+        self.black_save = black_save
+        self.white_save = white_save
         self.alpha = alpha
         self.init_weight = init_weight
         
     def save_network(self):
-        if self.save_file:
-            with open(self.save_file, 'wb') as fp:
-                pickle.dump(self.weight, fp, protocol=pickle.HIGHEST_PROTOCOL)
+        if self.black_save:
+            with open(self.black_save, 'wb') as fp:
+                pickle.dump(self.black_weight, fp, protocol=pickle.HIGHEST_PROTOCOL)
+        if self.white_save:
+            with open(self.white_save, 'wb') as fp:
+                pickle.dump(self.white_weight, fp, protocol=pickle.HIGHEST_PROTOCOL)
     def load_network(self):
-        with open(self.load_file, 'rb') as fp:
-            self.weight = pickle.load(fp)
+        if self.black_load:
+            with open(self.black_load, 'rb') as fp:
+                self.black_weight = pickle.load(fp)
+        if self.white_load:
+            with open(self.white_load, 'rb') as fp:
+                self.white_weight = pickle.load(fp)
     def set_tuple(self, tuple_list, tuple_size):
         self.tuple_list = tuple_list
         
         # init weight if need,else load weight from file
         if self.init_weight:
-            self.weight = []
+            self.black_weight = []
+            self.white_weight = []
             # every tuple has its own set of weight
             for i in range(len(tuple_list)):
                 # combination of single tuple at size = 3**size 
                 # init value at (-1, 1)
-                self.weight.append([random.uniform(-1, 1) for x in range(3**tuple_size)])
-        elif self.load_file:
-            self.load_network()
+                self.black_weight.append([random.uniform(-1, 1) for x in range(3**tuple_size)])
+                self.white_weight.append([random.uniform(-1, 1) for x in range(3**tuple_size)])
+        else:
+            if self.black_load or self.white_load:
+                self.load_network()
            
     # 旋轉盤面 順時針90度
     def rotate(self, board):
@@ -99,19 +111,16 @@ class agent():
                 key2 = 0
                 fv = 1
                 for node in tup:
-                    if self.is_black:
-                        # negate the board
-                        chess1 = NegateChess.get(tmp[node[0]][node[1]])
-                        chess2 = NegateChess.get(flip_board[node[0]][node[1]])
-                        key1 += (fv * chess1)
-                        key2 += (fv * chess2)
-                    else:
-                        key1 += (fv * tmp[node[0]][node[1]])
-                        key2 += (fv * flip_board[node[0]][node[1]])
+                    key1 += (fv * tmp[node[0]][node[1]])
+                    key2 += (fv * flip_board[node[0]][node[1]])
                     fv *= 3
                 # 通過 key 取得 weight
-                self.weight[idx][key1] += err
-                self.weight[idx][key2] += err
+                if self.is_black:
+                    self.black_weight[idx][key1] += err
+                    self.black_weight[idx][key2] += err
+                else:
+                    self.white_weight[idx][key1] += err
+                    self.white_weight[idx][key2] += err
             tmp = [list(r) for r in zip(*tmp[::-1])]
     ##################################################################################
     def GetStep(self, board, is_black):
@@ -127,7 +136,7 @@ class agent():
                 self.board = deepcopy(board)
                 self.board = self.set_and_flip(m, is_black)
                 val = self.value(self.board)
-                val += reward(self.board, is_black)
+                #val += reward(self.board, is_black)
                 if max_val is None:
                     max_val = val
                     step = m
@@ -156,19 +165,16 @@ class agent():
                 key2 = 0
                 fv = 1
                 for node in tup:
-                    if self.is_black:
-                        # negate the board
-                        chess1 = NegateChess.get(tmp[node[0]][node[1]])
-                        chess2 = NegateChess.get(flip_board[node[0]][node[1]])
-                        key1 += (fv * chess1)
-                        key2 += (fv * chess2)
-                    else:
-                        key1 += (fv * tmp[node[0]][node[1]])
-                        key2 += (fv * flip_board[node[0]][node[1]])
+                    key1 += (fv * tmp[node[0]][node[1]])
+                    key2 += (fv * flip_board[node[0]][node[1]])
                     fv *= 3
                 # 通過 key 取得 weight
-                val += self.weight[idx][key1]
-                val += self.weight[idx][key2]
+                if self.is_black:
+                    val += self.black_weight[idx][key1]
+                    val += self.black_weight[idx][key2]
+                else:
+                    val += self.white_weight[idx][key1]
+                    val += self.white_weight[idx][key2]
             # 旋轉clockwise 90°
             tmp = [list(r) for r in zip(*tmp[::-1])]
         return val

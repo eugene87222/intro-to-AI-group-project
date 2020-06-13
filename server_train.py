@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import timeit
 from copy import deepcopy
 
@@ -27,11 +21,7 @@ WHITE = 2
 BLACK = 1
 EMPTY = 0
 CORNER = -1
-
-
-# In[2]:
-
-
+#################################################################################
 # 從 pos 開始，把 n 個坐標 視作爲 一個tuple
 # n 決定 tuple 長度
 # d 決定 tuple 衍生方向
@@ -103,21 +93,112 @@ def tuple_set_three():
             tuple_list.append(gen_tuple(n, ALL_N_TUPLE, SOUTHEAST))
         
     return tuple_list, ALL_N_TUPLE
-def tuple_set_four():
-    ALL_N_TUPLE = 15
+############################################################################
+#
+#
+# to simulate game and do training
+###############################################################
+alpha = 0.1
+init_weight = False
+
+# =========================BLACK==================================
+black = agent(black_load = 'all_3_black.p',
+              black_save = 'all_3_black.p',
+              white_load = None,
+              white_save = None,
+              alpha = alpha,
+              init_weight = init_weight)
+tuple_list, tuple_size = tuple_set_two()
+black.set_tuple(tuple_list, tuple_size)
+
+# =========================WHITE==================================
+white = agent(black_load = None,
+              black_save = None,
+              white_load = 'all_3_white.p',
+              white_save = 'all_3_white.p',
+              alpha = alpha,
+              init_weight = init_weight)
+# tuple set 
+tuple_list, tuple_size = tuple_set_two()
+white.set_tuple(tuple_list, tuple_size)
+# ===============================================================
+
+__BLACK_TRAIN__ = True
+__WHITE_TRAIN__ = True
+__SAVE_NET__ = __WHITE_TRAIN__ or __BLACK_TRAIN__
+
+# num of games to be played
+NUM_GAMES = 1#0**10
+
+# True: 黑白棋手 先後手交替
+__SWITCH_SIDE__ = False
+first_hand = True
+# False: 取消時間限制設定
+Time_Limit_On = False
+Time_Limit_Seconds = 5
+
+# True: write every end game state to 'game_report.txt'
+__GAME_RECORD__ = False
+# True: write any TLE or illegal move to 'err_report.txt'
+__ERR_RECORD__ = True
+
+##############################################################################
+
+# init game variable
+judger = Game()
+error_encounter = 0
+blackwin = 0 
+whitewin = 0
+draw = 0
+total_bscore = 0
+total_wscore = 0
+
+start = timeit.default_timer()
+for match in range(NUM_GAMES):
+    judger.reset()
     
-    tuple_list = []
-    for row in range(4):
-        for col in range(4):
-            if row == 0 and col == 0:
-                continue
-            tuple_list.append([row, col])
-    return [tuple_list], ALL_N_TUPLE
+    play_game()
 
+    if __GAME_RECORD__:
+        judger.save_match()
+    
+    # brief summary
+    if True or match%50 == 0:
+        print('black', ' wins:', blackwin )
+        print('white', ' wins:', whitewin)
+        print('A Tie:', draw)
+        print('in total score, B:W', total_bscore, '-',total_wscore)
+        #judger.show()
 
-# In[3]:
+end = timeit.default_timer()
 
+print('========== END ==========')
+print('Total Game Played:', NUM_GAMES)
+print('black', ' wins:', blackwin )
+print('white', ' wins:', whitewin)
+print('A Tie:', draw)
+print('Time Taken:', end-start)
 
+if __GAME_RECORD__:
+    print('Game Summary...', end='')
+    judger.summary()
+    print('OK!')
+if error_encounter:
+    print('Error(s) encounter:', error_encounter)
+    if __ERR_RECORD__:
+        print('Error Summary...', end='')
+        judger.err_summary()
+        print('OK!')
+if __SAVE_NET__:
+    print('Saving Weight...', end='')
+    if __BLACK_TRAIN__:
+        black.save_network()
+    if __WHITE_TRAIN__:
+        white.save_network()
+    print('OK!')
+print('DONE!')
+
+###############################################################################
 def play_game():
     # 棋盤與玩家
     global judger
@@ -219,102 +300,4 @@ def play_game():
             white.close_episode()
     judger.ep += 1
 
-
-# In[4]:
-
-
-# to simulate game and do training
-alpha = 0.1
-init_weight = False
-
-# =========================BLACK==================================
-black = SearchingAgent(True, 10, 1, 100, 25, random_pick=True)
-
-#black = agent('black_all_3.p', 'black_all_3.p', 'black_all_3', alpha, init_weight) # load and save on 'black.p'
-# tuple set
-#tuple_list, tuple_size = tuple_set_two()
-#black.set_tuple(tuple_list, tuple_size)
-
-# =========================WHITE==================================
-white = agent('all_3_SA.p', 'all_3_SA_DEPTH=3.p', 'name', alpha, init_weight)
-# tuple set 
-tuple_list, tuple_size = tuple_set_two()
-white.set_tuple(tuple_list, tuple_size)
-
-__BLACK_TRAIN__ = False
-__WHITE_TRAIN__ = True
-__SAVE_NET__ = __WHITE_TRAIN__ or __BLACK_TRAIN__
-
-# num of games to be played
-NUM_GAMES = 100000
-
-# True: 黑白棋手 先後手交替
-__SWITCH_SIDE__ = True
-first_hand = True
-# False: 取消時間限制設定
-Time_Limit_On = False
-Time_Limit_Seconds = 5
-
-# True: write every end game state to 'game_report.txt'
-__GAME_RECORD__ = False
-# True: write any TLE or illegal move to 'err_report.txt'
-__ERR_RECORD__ = True
-
-
-# In[5]:
-
-
-# init game variable
-judger = Game()
-error_encounter = 0
-blackwin = 0 
-whitewin = 0
-draw = 0
-total_bscore = 0
-total_wscore = 0
-
-start = timeit.default_timer()
-for match in range(NUM_GAMES):
-    judger.reset()
-    
-    play_game()
-
-    if __GAME_RECORD__:
-        judger.save_match()
-    
-    # brief summary
-    if True or match%50 == 0:
-        print('black', ' wins:', blackwin )
-        print('white', ' wins:', whitewin)
-        print('A Tie:', draw)
-        print('in total score, B:W', total_bscore, '-',total_wscore)
-        #judger.show()
-
-end = timeit.default_timer()
-
-print('========== END ==========')
-print('Total Game Played:', NUM_GAMES)
-print('black', ' wins:', blackwin )
-print('white', ' wins:', whitewin)
-print('A Tie:', draw)
-print('Time Taken:', end-start)
-
-if __GAME_RECORD__:
-    print('Game Summary...', end='')
-    judger.summary()
-    print('OK!')
-if error_encounter:
-    print('Error(s) encounter:', error_encounter)
-    if __ERR_RECORD__:
-        print('Error Summary...', end='')
-        judger.err_summary()
-        print('OK!')
-if __SAVE_NET__:
-    print('Saving Weight...', end='')
-    if __BLACK_TRAIN__:
-        black.save_network()
-    if __WHITE_TRAIN__:
-        white.save_network()
-    print('OK!')
-print('DONE!')
-
+#############################################################################
