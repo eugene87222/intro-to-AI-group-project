@@ -46,7 +46,7 @@
 
 # Note
 
-> 每組跑 50 遍，共 100 場對局
+> 每組跑 50 遍，共 100 場對局  
 > 對於相同 score 的 move -> 選擇第一個走訪的
 
 |參數|結果|
@@ -59,12 +59,21 @@
 |DURATION = 4.98<br/>WEIGHT_PIECE = 100.0<br/>WEIGHT_EDGE = 1.0<br/>WEIGHT_MOVE = 10.0|我方勝場：49<br/>平手：5<br/>我方勝率：49.0%<br/>對方勝率：46.0%|
 |DURATION = 4.98<br/>WEIGHT_PIECE = 100.0<br/>WEIGHT_EDGE = 10.0<br/>WEIGHT_MOVE = 1.0|我方勝場：60<br/>平手：3<br/>我方勝率：60.0%<br/>對方勝率：37.0%|
 
-> 每組跑 50 遍，共 100 場對局
-> 對於相同 score 的 move -> 隨機挑一個
+---
+
+> 每組跑 50 遍，共 100 場對局  
+> 對於相同 score 的 move -> 隨機挑一個  
+> 看起來沒有比較好
 
 |參數|結果|
 |-|-|
 |DURATION = 4.98<br/>WEIGHT_PIECE = 0.1<br/>WEIGHT_EDGE = 100.0<br/>WEIGHT_MOVE = 10.0|我方勝場：57<br/>平手：3<br/>我方勝率：57.0%<br/>對方勝率：40.0%|
+|DURATION = 4.98<br/>WEIGHT_PIECE = 100.0<br/>WEIGHT_EDGE = 50.0<br/>WEIGHT_MOVE = 1.0|我方勝場：46<br/>平手：8<br/>我方勝率：46.0%<br/>對方勝率：46.0%|
+|DURATION = 4.98<br/>WEIGHT_PIECE = 100.0<br/>WEIGHT_EDGE = 1.0<br/>WEIGHT_MOVE = 50.0|我方勝場：51<br/>平手：6<br/>我方勝率：51.0%<br/>對方勝率：43.0%|
+|DURATION = 4.98<br/>WEIGHT_PIECE = 100.0<br/>WEIGHT_EDGE = 1.0<br/>WEIGHT_MOVE = 10.0|我方勝場：55<br/>平手：7<br/>我方勝率：55.0%<br/>對方勝率：38.0%|
+|DURATION = 4.98<br/>WEIGHT_PIECE = 100.0<br/>WEIGHT_EDGE = 10.0<br/>WEIGHT_MOVE = 1.0|我方勝場：47<br/>平手：6<br/>我方勝率：47.0%<br/>對方勝率：47.0%|
+|DURATION = 4.98<br/>WEIGHT_PIECE = 1.0<br/>WEIGHT_EDGE = 100.0<br/>WEIGHT_MOVE = 10.0|我方勝場：49<br/>平手：7<br/>我方勝率：49.0%<br/>對方勝率：44.0%|
+|DURATION = 4.98<br/>WEIGHT_PIECE = 10.0<br/>WEIGHT_EDGE = 100.0<br/>WEIGHT_MOVE = 50.0|我方勝場：54<br/>平手：4<br/>我方勝率：54.0%<br/>對方勝率：42.0%|
 
 # TODO
 

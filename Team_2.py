@@ -1,3 +1,4 @@
+import random
 import STcpClient
 from math import sqrt
 from copy import deepcopy
@@ -40,7 +41,7 @@ DIRECTIONS = (NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH, SOUTHWEST, WEST, NORTHWE
 
 
 class SearchingAgent():
-    def __init__(self, is_black, duration, weight_piece, weight_edge, weight_move):
+    def __init__(self, is_black, duration, weight_piece, weight_edge, weight_move, random_pick=False):
         self.PLAYER = is_black
         self.MAX_DEPTH = -1
         self.DURATION = duration
@@ -48,6 +49,8 @@ class SearchingAgent():
         self.WEIGHT_EDGE = weight_edge
         self.WEIGHT_MOVE = weight_move
         self.LIFETIME = None
+        self.RANDOM_PICK = random_pick
+        self.CANDIDATE = []
 
     def OutOfBoard(self, pos, direction):
         new_r = pos[0] + direction[0]
@@ -271,6 +274,8 @@ class SearchingAgent():
         return score
 
     def PVS(self, board, is_black, depth, alpha, beta):
+        if depth == 0:
+            self.CANDIDATE = []
         if depth>=self.MAX_DEPTH or datetime.now()>=self.LIFETIME:
             score = self.Evaluate(board, is_black)
             return score
@@ -282,7 +287,7 @@ class SearchingAgent():
                 return score
             else:
                 return -self.PVS(board, not is_black, depth, -beta, -alpha)
-        best_move = None
+        # best_move = None
         for i, move in enumerate(next_moves):
             new_board = self.PlaceAndFlip(board, move, is_black)
             if i == 0:
@@ -292,15 +297,24 @@ class SearchingAgent():
                 if alpha<score and score<beta:
                     score = -self.PVS(new_board, not is_black, depth+1, -beta, -score)
             if score > alpha:
-                best_move = move
+                # best_move = move
                 alpha = score
+                if depth == 0:
+                    self.CANDIDATE = [move]
+            elif score == alpha:
+                if depth == 0:
+                    self.CANDIDATE.append(move)
             if alpha >= beta:
                 break
             if datetime.now() >= self.LIFETIME:
                 print('moves 跑到一半')
                 break
         if depth == 0:
-            return best_move
+            # return best_move
+            if self.RANDOM_PICK:
+                return random.choice(self.CANDIDATE)
+            else:
+                return self.CANDIDATE[0]
         else:
             return alpha
     
@@ -316,7 +330,7 @@ class SearchingAgent():
 
 
 def GetStep(board, is_black):
-    Brain = SearchingAgent(is_black, 4.98, 1.0, 100.0, 10.0)
+    Brain = SearchingAgent(is_black, 4.98, 0.1, 100.0, 10.0, False)
     return Brain.GetStep(board, is_black)
 
 
