@@ -1,3 +1,12 @@
+WIDTH, HEIGHT = 8, 8
+NORTH = [-1, 0]
+NORTHEAST = [-1, 1]
+EAST = [0, 1]
+SOUTHEAST = [1, 1]
+SOUTH = [1, 0]
+SOUTHWEST = [1, -1]
+WEST = [0, -1]
+NORTHWEST = [-1, -1]
 #################################################################################
 # 從 pos 開始，把 n 個坐標 視作爲 一個tuple
 # n 決定 tuple 長度
