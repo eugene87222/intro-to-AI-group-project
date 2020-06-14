@@ -23,6 +23,8 @@ def play_game():
     global white
     
     global error_encounter
+    global __BLACK_TRAIN__
+    global __WHITE_TRAIN__
     
     # 記錄輸贏
     global blackwin
