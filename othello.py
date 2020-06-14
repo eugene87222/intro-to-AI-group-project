@@ -23,8 +23,6 @@ def play_game():
     global white
     
     global error_encounter
-    global __BLACK_TRAIN__
-    global __WHITE_TRAIN__
     
     # 記錄輸贏
     global blackwin
@@ -38,11 +36,9 @@ def play_game():
     is_black = True
     pass_turn = False
     NO_ERROR = True
-        
-    if __BLACK_TRAIN__:
-        black.open_episode()
-    if __WHITE_TRAIN__:
-        white.open_episode()
+    
+    black.open_episode()
+    white.open_episode()
     
     while True:
         board = deepcopy(judger.board)
@@ -105,10 +101,8 @@ def play_game():
                 total_wscore += wscore
                 break
     if NO_ERROR:
-        if __BLACK_TRAIN__:
-            black.close_episode()
-        if __WHITE_TRAIN__:
-            white.close_episode()
+        black.close_episode()
+        white.close_episode()
     judger.ep += 1
 class Game:
     def __init__(self):
