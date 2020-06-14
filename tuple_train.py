@@ -4,6 +4,7 @@ from copy import deepcopy
 from td_agent import *
 from othello import *
 from Team_2 import *
+from tuple_generator import *
 
 WIDTH, HEIGHT = 8, 8
 NORTH = [-1, 0]
@@ -21,18 +22,6 @@ WHITE = 2
 BLACK = 1
 EMPTY = 0
 CORNER = -1
-#################################################################################
-# 從 pos 開始，把 n 個坐標 視作爲 一個tuple
-# n 決定 tuple 長度
-# d 決定 tuple 衍生方向
-# 回傳 list(整個 tuple 的所有坐標)
-def gen_tuple(pos=[0,0], n = 0, d = SOUTH):
-    tup_list = []
-    for t in range(n):
-        tup_list.append(pos[:])
-        pos[0] += d[0]
-        pos[1] += d[1]
-    return tup_list
 
 def diff_weight():
     print('w:b')
@@ -43,62 +32,8 @@ def diff_weight():
         for idx_2 in range(len(w)):
             print(w[idx_2], b[idx_2])
 
-# all-3 tuple in reference
-def all_3_ref():
-    # all-3 tuple of reference
-    ALL_N_TUPLE = 3
-    
-    # 30 個 tuple 
-    tup_node = [[0,0] for i in range(4)] # row 0 1 2 3
-    tup_node[0] = [[x,0] for x in range(1,3)] # 1 2
-    tup_node[1] = [[x,1] for x in range(3)] # 0 1 2
-    tup_node[2] = [[x,2] for x in range(3)]
-    tup_node[3] = [[x,3] for x in range(3)]
-    
-    # SOUTH(下), SOUTHEAST（右下）
-    tuple_list = []
-    for node in tup_node:
-        for n in node:
-            tuple_list.append(gen_tuple(n, ALL_N_TUPLE, SOUTH))
-            
-    tup_node[0] = [[x,0] for x in range(1,6)] # 1 2 3 4 5
-    tup_node[1] = [[x,1] for x in range(1,5)] # 1 2 3 4 
-    tup_node[2] = [[x,2] for x in range(2,4)] # 2 3
-    tup_node[3] = [[x,3] for x in range(
-    for node in tup_node:
-        for n in node:
-            tuple_list.append(gen_tuple(n, ALL_N_TUPLE, SOUTHEAST))
-        
-    return tuple_list, ALL_N_TUPLE
-    
-def all_2():
-    # all-2 tuple based on all-3 tuple of reference
-    ALL_N_TUPLE = 2
-    
-    # 30 個 tuple 
-    tup_node = [[0,0] for i in range(3)]
-    tup_node[0] = [[x,0] for x in range(1,3)] # 1 2
-    tup_node[1] = [[x,1] for x in range(3)] # 0 1 2
-    tup_node[2] = [[x,2] for x in range(3)]
-    
-    
-    # SOUTH(下), SOUTHEAST（右下）
-    tuple_list = []
-    for node in tup_node:
-        for n in node:
-            tuple_list.append(gen_tuple(n, ALL_N_TUPLE, SOUTH))
-            
-    tup_node[0] = [[x,0] for x in range(1,6)] # 1 2 3 4 5
-    tup_node[1] = [[x,1] for x in range(1,5)] # 1 2 3 4 
-    tup_node[2] = [[x,1] for x in range(2,4)] # 2 3
-    for node in tup_node:
-        for n in node:
-            tuple_list.append(gen_tuple(n, ALL_N_TUPLE, SOUTHEAST))
-        
-    return tuple_list, ALL_N_TUPLE
-############################################################################
-#
-#
+
+###############################################################
 # to simulate game and do training
 ###############################################################
 alpha = 0.1
