@@ -266,9 +266,10 @@ class SearchingAgent():
                     if r in [0, HEIGHT-1] or c in [0, WIDTH-1]:
                         opponent_edge += 1
                 else:
-                    # print(f'ERROR, unknown value at {board[r][c]}')
                     pass
-        score = player_piece*self.WEIGHT_PIECE + player_edge*self.WEIGHT_EDGE + len(moves)*self.WEIGHT_MOVE
+        score = player_piece * self.WEIGHT_PIECE
+        score += player_edge * self.WEIGHT_EDGE
+        score += len(moves) * self.WEIGHT_MOVE
         if self.PLAYER != is_black:
             score *= -1
         return score
@@ -287,7 +288,6 @@ class SearchingAgent():
                 return score
             else:
                 return -self.PVS(board, not is_black, depth, -beta, -alpha)
-        # best_move = None
         for i, move in enumerate(next_moves):
             new_board = self.PlaceAndFlip(board, move, is_black)
             if i == 0:
@@ -297,7 +297,6 @@ class SearchingAgent():
                 if alpha<score and score<beta:
                     score = -self.PVS(new_board, not is_black, depth+1, -beta, -score)
             if score > alpha:
-                # best_move = move
                 alpha = score
                 if depth == 0:
                     self.CANDIDATE = [move]
@@ -307,10 +306,8 @@ class SearchingAgent():
             if alpha >= beta:
                 break
             if datetime.now() >= self.LIFETIME:
-                print('moves 跑到一半')
                 break
         if depth == 0:
-            # return best_move
             if self.RANDOM_PICK:
                 return random.choice(self.CANDIDATE)
             else:
@@ -320,7 +317,15 @@ class SearchingAgent():
     
     def SetMaxDepth(self, board, is_black):
         moves = self.GetValidMoves(board, is_black)
-        self.MAX_DEPTH = round(sqrt(72//len(moves))+0.5) + 1
+        empty = 0
+        for row in board:
+            for col in row:
+                if col == EMPTY:
+                    empty += 1
+        if empty <= 10:
+            self.MAX_DEPTH = 100
+        else:
+            self.MAX_DEPTH = round(sqrt(72//len(moves))+0.5) + 1 + int(empty < 15)
 
     def GetStep(self, board, is_black):
         self.LIFETIME = datetime.now() + timedelta(seconds=self.DURATION)
@@ -330,7 +335,7 @@ class SearchingAgent():
 
 
 def GetStep(board, is_black):
-    Brain = SearchingAgent(is_black, 4.98, 0.1, 100.0, 10.0, False)
+    Brain = SearchingAgent(is_black, 4.99, 0.1, 100.0, 75.0, True)
     return Brain.GetStep(board, is_black)
 
 
