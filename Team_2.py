@@ -316,7 +316,6 @@ class SearchingAgent():
             return alpha
     
     def SetMaxDepth(self, board, is_black):
-        moves = self.GetValidMoves(board, is_black)
         empty = 0
         for row in board:
             for col in row:
@@ -325,7 +324,7 @@ class SearchingAgent():
         if empty <= 10:
             self.MAX_DEPTH = 100
         else:
-            self.MAX_DEPTH = round(sqrt(72//len(moves))+0.5) + 1 + int(empty < 15)
+            self.MAX_DEPTH = 3 + int(empty < 15)
 
     def GetStep(self, board, is_black):
         self.LIFETIME = datetime.now() + timedelta(seconds=self.DURATION)
