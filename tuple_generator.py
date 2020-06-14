@@ -15,9 +15,9 @@ def gen_tuple(pos=[0,0], n = 0, d = SOUTH):
 def all_3_ref():
     ALL_N_TUPLE = 3
 
-    tup_node = [ [] for i in range(4)] # row 0 1 2 3
+    tup_node = [ [] for i in range(4)] # row 0-3
     tup_node[0] = [[x,0] for x in range(1,3)] # 1 2
-    tup_node[1] = [[x,1] for x in range(3)] # 0 1 2
+    tup_node[1] = [[x,1] for x in range(3)] # 0-2
     tup_node[2] = [[x,2] for x in range(3)]
     tup_node[3] = [[x,3] for x in range(3)]
     
@@ -26,9 +26,9 @@ def all_3_ref():
         for n in node:
             tuple_list.append(gen_tuple(n, ALL_N_TUPLE, SOUTH))
             
-    tup_node[0] = [[x,0] for x in range(1,6)] # 1 2 3 4 5
-    tup_node[1] = [[x,1] for x in range(1,5)] # 1 2 3 4 
-    tup_node[2] = [[x,2] for x in range(2,4)] # 2 3
+    tup_node[0] = [[x,0] for x in range(1,6)] # 1-5
+    tup_node[1] = [[x,1] for x in range(1,5)] # 1-4 
+    tup_node[2] = [[x,2] for x in range(2,4)] # 2-3
     del tup_node[3]
     
     for node in tup_node:
@@ -40,7 +40,7 @@ def all_3_ref():
 def all_3_custom():
     ALL_N_TUPLE = 3
     
-    tup_node = [ [] for i in range(4)] # row 0 1 2 3
+    tup_node = [ [] for i in range(4)] # row 0-3
     tup_node[0] = [[x,0] for x in range(1,3)] # 1 2
     tup_node[1] = [[x,1] for x in range(3)] # 0 1 2
     tup_node[2] = [[x,2] for x in range(3)]
@@ -51,7 +51,7 @@ def all_3_custom():
         for n in node:
             tuple_list.append(gen_tuple(n, ALL_N_TUPLE, SOUTH))
             
-    tup_node[0] = [[x,0] for x in range(1,6)] # 1 2 3 4 5
+    tup_node[0] = [[x,0] for x in range(1,6)] # 1-5
     tup_node[1] = [[x,1] for x in range(0,6)] # 0~5 
     tup_node[2] = [[x,2] for x in range(0,6)] # 0~5 
     tup_node[3] = [[x,3] for x in range(0,6)] # 0~5 
@@ -66,8 +66,8 @@ def all_2_ref():
     ALL_N_TUPLE = 2
     
     tup_node = [ [] for i in range(4)]
-    tup_node[0] = [[x,0] for x in range(1,4)] # 1 2 3
-    tup_node[1] = [[x,1] for x in range(4)] # 0 1 2 3
+    tup_node[0] = [[x,0] for x in range(1,4)] # 1-3
+    tup_node[1] = [[x,1] for x in range(4)] # 0-3
     tup_node[2] = [[x,2] for x in range(4)]
     tup_node[3] = [[x,3] for x in range(4)]
     
@@ -76,9 +76,9 @@ def all_2_ref():
         for n in node:
             tuple_list.append(gen_tuple(n, ALL_N_TUPLE, SOUTH))
             
-    tup_node[0] = [[x,0] for x in range(1,6)] # 1 2 3 4 5
-    tup_node[1] = [[x,1] for x in range(1,7)] # 1 2 3 4 5 6
-    tup_node[2] = [[x,2] for x in range(2,6)] # 2 3 4 5 
+    tup_node[0] = [[x,0] for x in range(1,6)] # 1-5
+    tup_node[1] = [[x,1] for x in range(1,7)] # 1-6
+    tup_node[2] = [[x,2] for x in range(2,6)] # 2-5 
     tup_node[3] = [[x,3] for x in range(2,6)]
     
     for node in tup_node:
@@ -90,9 +90,9 @@ def all_2_ref():
 def all_2_custom():
     ALL_N_TUPLE = 2
     
-    tup_node = [ [] for i in range(4)]
-    tup_node[0] = [[x,0] for x in range(1,4)] # 1 2 3
-    tup_node[1] = [[x,1] for x in range(4)] # 0 1 2 3
+    tup_node = [ [] for i in range(5)]
+    tup_node[0] = [[x,0] for x in range(1,4)] # 1-3
+    tup_node[1] = [[x,1] for x in range(4)] # 0-3
     tup_node[2] = [[x,2] for x in range(4)]
     tup_node[3] = [[x,3] for x in range(4)]
     
@@ -101,9 +101,9 @@ def all_2_custom():
         for n in node:
             tuple_list.append(gen_tuple(n, ALL_N_TUPLE, SOUTH))
             
-    tup_node[0] = [[x,0] for x in range(1,7)] # 1 2 3 4 5
-    tup_node[1] = [[x,1] for x in range(0,7)] # 1 2 3 4 
-    tup_node[2] = [[x,2] for x in range(0,7)] # 2 3
+    tup_node[0] = [[x,0] for x in range(1,7)] # 1-6
+    tup_node[1] = [[x,1] for x in range(0,7)] # 0-6
+    tup_node[2] = [[x,2] for x in range(0,7)]
     tup_node[3] = [[x,3] for x in range(0,7)]
     tup_node[4] = [[x,4] for x in range(0,7)]
     
