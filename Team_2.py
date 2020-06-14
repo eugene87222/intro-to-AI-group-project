@@ -335,7 +335,10 @@ class SearchingAgent():
 
 
 def GetStep(board, is_black):
-    Brain = SearchingAgent(is_black, 4.99, 0.1, 100.0, 75.0, True)
+    if is_black:
+        Brain = SearchingAgent(is_black, 4.99, 0.1, 100.0, 75.0, True)
+    else:
+        Brain = SearchingAgent(is_black, 4.99, 1.0, 100.0, 10.0, True)
     return Brain.GetStep(board, is_black)
 
 
