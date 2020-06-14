@@ -22,9 +22,6 @@ def play_game():
     global black
     global white
     
-    global __SWITCH_SIDE__
-    global first_hand
-    
     global error_encounter
     
     # 記錄輸贏
@@ -39,11 +36,6 @@ def play_game():
     is_black = True
     pass_turn = False
     NO_ERROR = True
-    
-    if __SWITCH_SIDE__:
-        if not first_hand:
-            is_black = False
-        first_hand = not first_hand
         
     if __BLACK_TRAIN__:
         black.open_episode()
