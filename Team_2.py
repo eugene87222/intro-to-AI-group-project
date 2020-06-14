@@ -341,11 +341,11 @@ def GetStep(board, is_black):
         Brain = SearchingAgent(is_black, 4.99, 1.0, 100.0, 10.0, True)
     return Brain.GetStep(board, is_black)
 
-
-while(True):
-    (stop_program, id_package, board, is_black) = STcpClient.GetBoard()
-    if(stop_program):
-        break
+if __name__ == '__main__':
+    while(True):
+        (stop_program, id_package, board, is_black) = STcpClient.GetBoard()
+        if(stop_program):
+            break
 
     Step = GetStep(board, is_black)
     STcpClient.SendStep(id_package, Step)
