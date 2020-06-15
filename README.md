@@ -20,7 +20,7 @@
 - white_load..: 後手的 weight 路徑
 
 #
-black vs white             		win			score		
+black_vs_white-win-score		
 -----------------------------
 
 all_3
