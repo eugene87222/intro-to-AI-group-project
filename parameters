@@ -1,0 +1,25 @@
+# all-3
+#black_tset, black_n_size = all_3_ref()
+#black_fn = 'weight/all_3_ref_black.p'
+
+#white_tset, white_n_size = all_3_ref()
+#white_fn = 'weight/all_3_ref_white.p'
+
+#black_tset, black_n_size = all_3_custom()
+#black_fn = 'all_3_custom_black.p'
+
+#white_tset, white_n_size = all_3_custom()
+#white_fn = 'all_3_custom_white.p'
+###########################################################
+# all-2
+#black_tset, black_n_size = all_2_ref()
+#black_fn = 'weight/all_2_ref_black.p'
+
+#white_tset, white_n_size = all_2_ref()
+#white_fn = 'weight/all_2_ref_white.p'
+
+#black_tset, black_n_size = all_2_custom()
+#black_fn = 'weight/all_2_custom_black.p'
+
+#white_tset, white_n_size = all_2_custom()
+#white_fn = 'weight/all_2_custom_white.p'
