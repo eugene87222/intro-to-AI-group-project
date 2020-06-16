@@ -66,7 +66,7 @@
 # Note
 
 > SA.py 跟助教提供的 AI 對局的結果  
-> 對局 100 場對
+> 對局 100 場對  
 > 對於相同 score 的 move -> 選擇第一個走訪的
 
 |參數|結果|
@@ -82,7 +82,7 @@
 ---
 
 > SA.py 跟助教提供的 AI 對局的結果  
-> 對局 100 場對
+> 對局 100 場對  
 > 對於相同 score 的 move -> 隨機挑一個  
 > 看起來沒有比較好
 
@@ -95,12 +95,6 @@
 |DURATION = 4.98<br/>WEIGHT_PIECE = 100.0<br/>WEIGHT_EDGE = 10.0<br/>WEIGHT_MOVE = 1.0|我方勝場：47<br/>平手：6<br/>我方勝率：47.0%<br/>對方勝率：47.0%|
 |DURATION = 4.98<br/>WEIGHT_PIECE = 1.0<br/>WEIGHT_EDGE = 100.0<br/>WEIGHT_MOVE = 10.0|我方勝場：49<br/>平手：7<br/>我方勝率：49.0%<br/>對方勝率：44.0%|
 |DURATION = 4.98<br/>WEIGHT_PIECE = 10.0<br/>WEIGHT_EDGE = 100.0<br/>WEIGHT_MOVE = 50.0|我方勝場：54<br/>平手：4<br/>我方勝率：54.0%<br/>對方勝率：42.0%|
-
-<style>
-table {
-    width:100%;
-}
-</style>
 
 # TODO
 
