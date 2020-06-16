@@ -309,10 +309,12 @@ class agent():
         return test_board
 
 
+brain = agent()
+tuple_list, tuple_size = all_3_custom()
+brain.set_tuple(tuple_list, tuple_size)
+
+
 def GetStep(board, is_black):
-    brain = agent()
-    tuple_list, tuple_size = all_3_custom()
-    brain.set_tuple(tuple_list, tuple_size)
     return brain.GetStep(board, is_black)
 
 
