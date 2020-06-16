@@ -287,6 +287,7 @@ class SearchingAgent():
             if alpha >= beta:
                 break
             if datetime.now() >= self.LIFETIME:
+                print('跑一半')
                 break
         if depth == 0:
             if self.RANDOM_PICK:
