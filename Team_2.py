@@ -310,10 +310,7 @@ class agent():
 
 
 def GetStep(board, is_black):
-    if is_black:
-        brain = agent()
-    else:
-        brain = agent()
+    brain = agent()
     tuple_list, tuple_size = all_3_custom()
     brain.set_tuple(tuple_list, tuple_size)
     return brain.GetStep(board, is_black)
