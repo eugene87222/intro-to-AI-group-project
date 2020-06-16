@@ -1,8 +1,7 @@
+import pickle
 import random
 import STcpClient
-from math import sqrt
 from copy import deepcopy
-from datetime import datetime, timedelta
 
 '''
 ID : 2
@@ -22,12 +21,6 @@ ID : 2
             r, c 表示要下棋子的座標位置 (row, column) (zero-base)
 '''
 
-INF = 1e10
-CORNER = -1
-EMPTY = 0
-BLACK = 1
-WHITE = 2
-
 WIDTH, HEIGHT = 8, 8
 NORTH = [-1, 0]
 NORTHEAST = [-1, 1]
@@ -37,308 +30,250 @@ SOUTH = [1, 0]
 SOUTHWEST = [1, -1]
 WEST = [0, -1]
 NORTHWEST = [-1, -1]
+
 DIRECTIONS = (NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH, SOUTHWEST, WEST, NORTHWEST)
+WHITE = 2
+BLACK = 1
+EMPTY = 0
+CORNER = -1
+
+# 從 pos 開始，把 n 個座標視為一個 tuple
+# n 決定 tuple 長度
+# d 決定 tuple 衍生方向
+# 回傳 list (整個 tuple 的所有座標)
+def gen_tuple(pos=[0, 0], n=0, d=SOUTH):
+    tup_list = []
+    for t in range(n):
+        tup_list.append(pos[:])
+        pos[0] += d[0]
+        pos[1] += d[1]
+    return tup_list
 
 
-class SearchingAgent():
-    def __init__(self, is_black, duration, weight_piece, weight_edge, weight_move, random_pick=False):
-        self.PLAYER = is_black
-        self.MAX_DEPTH = -1
-        self.DURATION = duration
-        self.WEIGHT_PIECE = weight_piece
-        self.WEIGHT_EDGE = weight_edge
-        self.WEIGHT_MOVE = weight_move
-        self.LIFETIME = None
-        self.RANDOM_PICK = random_pick
-        self.CANDIDATE = []
+# all-3 tuple in reference
+def all_3_ref():
+    ALL_N_TUPLE = 3
 
-    def OutOfBoard(self, pos, direction):
-        new_r = pos[0] + direction[0]
-        new_c = pos[1] + direction[1]
-        if new_r<0 or new_r>=HEIGHT:
-            return True, (new_r, new_c)
-        if new_c<0 or new_c>=WIDTH:
-            return True, (new_r, new_c)
-        if new_r in [0, HEIGHT-1] and new_c in [0, WIDTH-1]:
-            return True, (new_r, new_c)
-        return False, (new_r, new_c)
-
-    def IsValidMove(self, board, pos, direction, is_black):
-        res = self.OutOfBoard(pos, direction)
-        if not res[0]:
-            next_pos = res[1]
-        else:
-            return False
-        player, opponent = (BLACK, WHITE) if is_black else (WHITE, BLACK)
-        if board[next_pos[0]][next_pos[1]] == opponent:
-            while board[next_pos[0]][next_pos[1]] == opponent:
-                res = self.OutOfBoard(next_pos, direction)
-                if res[0]:
-                    return False
-                else:
-                    next_pos = res[1]
-            if board[next_pos[0]][next_pos[1]] == player:
-                return True
-        return False
-
-    def GetValidMoves(self, board, is_black):
-        moves = []
-        player, opponent = (BLACK, WHITE) if is_black else (WHITE, BLACK)
-        # upper edge ==============================================================
-        if board[0][1] == EMPTY:
-            for d in [SOUTH, SOUTHEAST, EAST]:
-                if self.IsValidMove(board, (0, 1), d, is_black):
-                    moves.append((0, 1))
-                    break
-        if board[0][2] == EMPTY:
-            for d in [SOUTHWEST, SOUTH, SOUTHEAST, EAST]:
-                if self.IsValidMove(board, (0, 2), d, is_black):
-                    moves.append((0, 2))
-                    break
-        if board[0][3] == EMPTY:
-            for d in [WEST, SOUTHWEST, SOUTH, SOUTHEAST, EAST]:
-                if self.IsValidMove(board, (0, 3), d, is_black):
-                    moves.append((0, 3))
-                    break
-        if board[0][4] == EMPTY:
-            for d in [WEST, SOUTHWEST, SOUTH, SOUTHEAST, EAST]:
-                if self.IsValidMove(board, (0, 4), d, is_black):
-                    moves.append((0, 4))
-                    break
-        if board[0][5] == EMPTY:
-            for d in [WEST, SOUTHWEST, SOUTH, SOUTHEAST]:
-                if self.IsValidMove(board, (0, 5), d, is_black):
-                    moves.append((0, 5))
-                    break
-        if board[0][6] == EMPTY:
-            for d in [WEST, SOUTHWEST, SOUTH]:
-                if self.IsValidMove(board, (0, 6), d, is_black):
-                    moves.append((0, 6))
-                    break
-        # left edge ==============================================================
-        if board[1][0] == EMPTY:
-            for d in [EAST, SOUTHEAST, SOUTH]:
-                if self.IsValidMove(board, (1, 0), d, is_black):
-                    moves.append((1, 0))
-                    break
-        if board[2][0] == EMPTY:
-            for d in [NORTHEAST, EAST, SOUTHEAST, SOUTH]:
-                if self.IsValidMove(board, (2, 0), d, is_black):
-                    moves.append((2, 0))
-                    break
-        if board[3][0] == EMPTY:
-            for d in [NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH]:
-                if self.IsValidMove(board, (3, 0), d, is_black):
-                    moves.append((3, 0))
-                    break
-        if board[4][0] == EMPTY:
-            for d in [NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH]:
-                if self.IsValidMove(board, (4, 0), d, is_black):
-                    moves.append((4, 0))
-                    break
-        if board[5][0] == EMPTY:
-            for d in [NORTH, NORTHEAST, EAST, SOUTHEAST]:
-                if self.IsValidMove(board, (5, 0), d, is_black):
-                    moves.append((5, 0))
-                    break
-        if board[6][0] == EMPTY:
-            for d in [NORTH, NORTHEAST, EAST]:
-                if self.IsValidMove(board, (6, 0), d, is_black):
-                    moves.append((6, 0))
-                    break
-        # lower edge ==============================================================
-        if board[7][1] == EMPTY:
-            for d in [NORTH, NORTHEAST, EAST]:
-                if self.IsValidMove(board, (7, 1), d, is_black):
-                    moves.append((7, 1))
-                    break
-        if board[7][2] == EMPTY:
-            for d in [NORTHWEST, NORTH, NORTHEAST, EAST]:
-                if self.IsValidMove(board, (7, 2), d, is_black):
-                    moves.append((7, 2))
-                    break
-        if board[7][3] == EMPTY:
-            for d in [WEST, NORTHWEST, NORTH, NORTHEAST, EAST]:
-                if self.IsValidMove(board, (7, 3), d, is_black):
-                    moves.append((7, 3))
-                    break
-        if board[7][4] == EMPTY:
-            for d in [WEST, NORTHWEST, NORTH, NORTHEAST, EAST]:
-                if self.IsValidMove(board, (7, 4), d, is_black):
-                    moves.append((7, 4))
-                    break
-        if board[7][5] == EMPTY:
-            for d in [WEST, NORTHWEST, NORTH, NORTHEAST]:
-                if self.IsValidMove(board, (7, 5), d, is_black):
-                    moves.append((7, 5))
-                    break
-        if board[7][6] == EMPTY:
-            for d in [WEST, NORTHWEST, NORTH]:
-                if self.IsValidMove(board, (7, 6), d, is_black):
-                    moves.append((7, 6))
-                    break
-        # right edge ==============================================================
-        if board[1][7] == EMPTY:
-            for d in [WEST, SOUTHWEST, SOUTH]:
-                if self.IsValidMove(board, (1, 7), d, is_black):
-                    moves.append((1, 7))
-                    break
-        if board[2][7] == EMPTY:
-            for d in [NORTHWEST, WEST, SOUTHWEST, SOUTH]:
-                if self.IsValidMove(board, (2, 7), d, is_black):
-                    moves.append((2, 7))
-                    break
-        if board[3][7] == EMPTY:
-            for d in [NORTH, NORTHWEST, WEST, SOUTHWEST, SOUTH]:
-                if self.IsValidMove(board, (3, 7), d, is_black):
-                    moves.append((3, 7))
-                    break
-        if board[4][7] == EMPTY:
-            for d in [NORTH, NORTHWEST, WEST, SOUTHWEST, SOUTH]:
-                if self.IsValidMove(board, (4, 7), d, is_black):
-                    moves.append((4, 7))
-                    break
-        if board[5][7] == EMPTY:
-            for d in [NORTH, NORTHWEST, WEST, SOUTHWEST]:
-                if self.IsValidMove(board, (5, 7), d, is_black):
-                    moves.append((5, 7))
-                    break
-        if board[6][7] == EMPTY:
-            for d in [NORTH, NORTHWEST, WEST]:
-                if self.IsValidMove(board, (6, 7), d, is_black):
-                    moves.append((6, 7))
-                    break
-        # central 6x6 =============================================================
-        for r in range(1, HEIGHT-1):
-            for c in range(1, WIDTH-1):
-                if board[r][c] == EMPTY:
-                    moves.append((r, c))
-        return moves
-
-    def CheckFlip(self, board, pos, direction, is_black):
-        res = self.OutOfBoard(pos, direction)
-        flip = []
-        if not res[0]:
-            pos = res[1]
-        else:
-            return False, []
-        player, opponent = (BLACK, WHITE) if is_black else (WHITE, BLACK)
-        if board[pos[0]][pos[1]] == opponent:
-            while board[pos[0]][pos[1]] == opponent:
-                flip.append(pos)
-                res = self.OutOfBoard(pos, direction)
-                if res[0]:
-                    break
-                else:
-                    pos = res[1]
-            if board[pos[0]][pos[1]] == player:
-                return True, flip
-        return False, []
-
-    def PlaceAndFlip(self, board, pos, is_black):
-        player, opponent = (BLACK, WHITE) if is_black else (WHITE, BLACK)
-        new_board = deepcopy(board)
-        new_board[pos[0]][pos[1]] = player
-        for d in DIRECTIONS:
-            res = self.CheckFlip(new_board, pos, d, is_black)
-            if res[0]:
-                for t in res[1]:
-                    new_board[t[0]][t[1]] = player
-        return new_board
-
-    def Evaluate(self, board, is_black):
-        player, opponent = (BLACK, WHITE) if is_black else (WHITE, BLACK)
-        moves = self.GetValidMoves(board, is_black)
-        player_edge = 0
-        player_piece = 0
-        opponent_edge = 0
-        opponent_piece = 0
-        for r in range(HEIGHT):
-            for c in range(WIDTH):
-                if board[r][c]==EMPTY or board[r][c]==CORNER:
-                    continue
-                elif board[r][c] == player:
-                    player_piece += 1
-                    if r in [0, HEIGHT-1] or c in [0, WIDTH-1]:
-                        player_edge += 1
-                elif board[r][c] == opponent:
-                    opponent_piece += 1
-                    if r in [0, HEIGHT-1] or c in [0, WIDTH-1]:
-                        opponent_edge += 1
-                else:
-                    pass
-        score = player_piece * self.WEIGHT_PIECE
-        score += player_edge * self.WEIGHT_EDGE
-        score += len(moves) * self.WEIGHT_MOVE
-        if self.PLAYER != is_black:
-            score *= -1
-        return score
-
-    def PVS(self, board, is_black, depth, alpha, beta):
-        if depth == 0:
-            self.CANDIDATE = []
-        if depth>=self.MAX_DEPTH or datetime.now()>=self.LIFETIME:
-            score = self.Evaluate(board, is_black)
-            return score
-        next_moves = self.GetValidMoves(board, is_black)
-        if len(next_moves) == 0:
-            oppo_next_moves = self.GetValidMoves(board, not is_black)
-            if len(oppo_next_moves) == 0:
-                score = self.Evaluate(board, is_black)
-                return score
-            else:
-                return -self.PVS(board, not is_black, depth, -beta, -alpha)
-        for i, move in enumerate(next_moves):
-            new_board = self.PlaceAndFlip(board, move, is_black)
-            if i == 0:
-                score = -self.PVS(new_board, not is_black, depth+1, -beta, -alpha)
-            else:
-                score = -self.PVS(new_board, not is_black, depth+1, -alpha-1, -alpha)
-                if alpha<score and score<beta:
-                    score = -self.PVS(new_board, not is_black, depth+1, -beta, -score)
-            if score > alpha:
-                alpha = score
-                if depth == 0:
-                    self.CANDIDATE = [move]
-            elif score == alpha:
-                if depth == 0:
-                    self.CANDIDATE.append(move)
-            if alpha >= beta:
-                break
-            if datetime.now() >= self.LIFETIME:
-                break
-        if depth == 0:
-            if self.RANDOM_PICK:
-                return random.choice(self.CANDIDATE)
-            else:
-                return self.CANDIDATE[0]
-        else:
-            return alpha
+    tup_node = [ [] for i in range(4)] # row 0-3
+    tup_node[0] = [[x,0] for x in range(1,3)] # 1 2
+    tup_node[1] = [[x,1] for x in range(3)] # 0-2
+    tup_node[2] = [[x,2] for x in range(3)]
+    tup_node[3] = [[x,3] for x in range(3)]
     
-    def SetMaxDepth(self, board, is_black):
-        empty = 0
-        for row in board:
-            for col in row:
-                if col == EMPTY:
-                    empty += 1
-        if empty <= 10:
-            self.MAX_DEPTH = 100
-        else:
-            self.MAX_DEPTH = 3 + int(empty < 15)
+    tuple_list = []
+    for node in tup_node:
+        for n in node:
+            tuple_list.append(gen_tuple(n, ALL_N_TUPLE, SOUTH))
+            
+    tup_node[0] = [[x,0] for x in range(1,6)] # 1-5
+    tup_node[1] = [[x,1] for x in range(1,5)] # 1-4 
+    tup_node[2] = [[x,2] for x in range(2,4)] # 2-3
+    del tup_node[3]
+    
+    for node in tup_node:
+        for n in node:
+            tuple_list.append(gen_tuple(n, ALL_N_TUPLE, SOUTHEAST))
+        
+    return tuple_list, ALL_N_TUPLE
+
+
+# all-3 tuple customize version
+def all_3_custom():
+    ALL_N_TUPLE = 3
+    
+    tup_node = [ [] for i in range(4)] # row 0-3
+    tup_node[0] = [[x,0] for x in range(1,3)] # 1 2
+    tup_node[1] = [[x,1] for x in range(3)] # 0 1 2
+    tup_node[2] = [[x,2] for x in range(3)]
+    tup_node[3] = [[x,3] for x in range(3)]
+    
+    tuple_list = []
+    for node in tup_node:
+        for n in node:
+            tuple_list.append(gen_tuple(n, ALL_N_TUPLE, SOUTH))
+            
+    tup_node[0] = [[x,0] for x in range(1,6)] # 1-5
+    tup_node[1] = [[x,1] for x in range(0,6)] # 0~5 
+    tup_node[2] = [[x,2] for x in range(0,6)] # 0~5 
+    tup_node[3] = [[x,3] for x in range(0,6)] # 0~5 
+    
+    for node in tup_node:
+        for n in node:
+            tuple_list.append(gen_tuple(n, ALL_N_TUPLE, SOUTHEAST))
+        
+    return tuple_list, ALL_N_TUPLE
+
+
+# reinforcement learning with n-tuple network
+class agent():
+    def __init__(self, black_load=None, white_load=None):
+        self.black_load = black_load
+        self.white_load = white_load
+
+    def load_network(self):
+        if self.black_load:
+            with open(self.black_load, 'rb') as fp:
+                self.black_weight = pickle.load(fp)
+        if self.white_load:
+            with open(self.white_load, 'rb') as fp:
+                self.white_weight = pickle.load(fp)
+
+    def set_tuple(self, tuple_list, tuple_size):
+        self.tuple_list = tuple_list
+        self.load_network()
 
     def GetStep(self, board, is_black):
-        self.LIFETIME = datetime.now() + timedelta(seconds=self.DURATION)
-        self.SetMaxDepth(board, is_black)        
-        move = self.PVS(board, is_black, 0, -INF, INF)
-        return move
+        # n tuple network
+        self.board = (board)
+        self.is_black = is_black
+        
+        moves = self.get_valid_moves(is_black)
+        if moves:
+            (max_val, step) = (None, moves[0])
+            for m in moves:
+                self.board = deepcopy(board)
+                self.board = self.set_and_flip(m, is_black)
+                val = self.value(self.board)
+                if max_val is None:
+                    max_val = val
+                    step = m
+                elif val > max_val:
+                    max_val = val
+                    step = m
+        else:
+            return None
+        return step
+
+    def value(self, board):
+        val = 0
+        tmp = deepcopy(board)
+
+        # 旋轉盤面 4 次的 symmetric tuple
+        for loop in range(4):
+            # 水平面翻轉
+            flip_board = tmp[::-1]
+            
+            for idx in range(len(self.tuple_list)):
+                tup = self.tuple_list[idx]
+                key1 = 0
+                key2 = 0
+                fv = 1
+                for node in tup:
+                    key1 += (fv * tmp[node[0]][node[1]])
+                    key2 += (fv * flip_board[node[0]][node[1]])
+                    fv *= 3
+                # 通過 key 取得 weight
+                if self.is_black:
+                    val += self.black_weight[idx][key1]
+                    val += self.black_weight[idx][key2]
+                else:
+                    val += self.white_weight[idx][key1]
+                    val += self.white_weight[idx][key2]
+            # 旋轉 clockwise 90°
+            tmp = [list(r) for r in zip(*tmp[::-1])]
+        return val
+
+    # return set of possible moves
+    def get_valid_moves(self, is_black):
+        moves = []
+        for row in range(HEIGHT):
+            for col in range(WIDTH):
+                if self.is_legal_move([row, col], is_black):
+                    moves.append([row, col])
+        return moves
+
+    def is_legal_move(self, step, is_black):
+        # determine whether an action is legal
+        (row, col) = step
+        
+        # the position must be empty
+        if self.board[row][col] != EMPTY or self.board[row][col] == CORNER:
+            return False
+        
+        # inside 6x6
+        if row > 0 and row < 7 \
+        and col > 0 and col < 7:
+            return True
+        
+        # out of 8x8
+        if row < 0 or col < 0 \
+        or row > 7 or col > 7:
+            return False
+        
+        # edge placement: check flip rule is satisfied
+        who, opponent = (BLACK, WHITE) if is_black else (WHITE, BLACK)
+
+        for d in DIRECTIONS:
+            (row, col) = step
+            flip = False
+            for loop in range(7):
+                # move one step forward in Direction d
+                row += d[0]
+                col += d[1]
+
+                # out of bound
+                if row < 0 or col < 0 \
+                or row > 7 or col > 7:
+                    break
+                
+                # who -> opponent(+) -> who ===> flip
+                if self.board[row][col] == EMPTY or self.board[row][col] == CORNER:
+                    break
+                if self.board[row][col] == who:
+                    if flip:
+                        return True
+                    else:
+                        break
+                if self.board[row][col] == opponent:
+                    fli = [row,col]
+                    flip = True
+        return False
+
+    def set_and_flip(self, step, is_black):
+        test_board = deepcopy(self.board)
+        
+        test_board[step[0]][step[1]] = BLACK if is_black else WHITE
+        
+        who, opponent = (BLACK, WHITE) if is_black else (WHITE, BLACK)
+        for d in DIRECTIONS:
+            (row, col) = step
+            flip = False
+            flip_set = []
+            for loop in range(7):
+                # move one step foward in Direction d
+                row += d[0]
+                col += d[1]
+                
+                # out of bound
+                if row < 0 or col < 0 \
+                or row > 7 or col > 7:
+                    break
+
+                if test_board[row][col] == EMPTY or test_board[row][col] == CORNER:
+                    break
+                if test_board[row][col] == who:
+                    if flip:
+                        # this edge placement is legal
+                        for s in flip_set:
+                            r,c = s
+                            test_board[r][c] = who
+                        break
+                    else:
+                        break
+                if test_board[row][col] == opponent:
+                    flip_set.append([row, col])
+                    flip = True
+        return test_board
 
 
 def GetStep(board, is_black):
     if is_black:
-        Brain = SearchingAgent(is_black, 4.99, 0.1, 100.0, 75.0, True)
+        brain = agent(black_load='./Team_2_all_3_custom_black.p')
     else:
-        Brain = SearchingAgent(is_black, 4.99, 1.0, 100.0, 10.0, True)
-    return Brain.GetStep(board, is_black)
+        brain = agent(white_load='./Team_2_all_3_custom_white.p')
+    tuple_list, tuple_size = all_3_custom()
+    brain.set_tuple(tuple_list, tuple_size)
+    return brain.GetStep(board, is_black)
 
 
 while(True):

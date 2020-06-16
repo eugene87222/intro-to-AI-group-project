@@ -1,11 +1,11 @@
 - Content
-  - [About Team_2.py](#About_Team_2.py)
+  - [SA.py](#SA.py)
+  - [Team_2.py](#Team_2.py)
   - [Note](#Note)
   - [TODO](#TODO)
 
-# About Team_2.py
+# SA.py
 
-- 用 [PVS](https://en.wikipedia.org/wiki/Principal_variation_search) 實作
 - global variables
   - `INF`：隨便定的 infinity，目前設 1e10
   - `CORNER, EMPTY, BLACK, WHITE`：隨便給數字，增加 code readability 而已
@@ -44,9 +44,28 @@
     - `PVS(board, is_black, depth, alpha, beta)`
       - https://en.wikipedia.org/wiki/Principal_variation_search
 
+# Team_2.py
+
+- 將訓練好的 weights 用於對局
+
+# weight folder
+
+- 利用 reinforcement learning - TD learning 學習出來的 weights
+- 有四個本版：訓練 10 萬、15 萬、20 萬、25 萬場的 weights
+- `.p` 檔名開頭的 `all_{數字}`
+  - `all_2`：使用 2-tuple 訓練
+  - `all_3`：使用 3-tuple 訓練
+- `.p` 檔名中間的 `ref`、`custom`
+  - `ref`：參考 paper 所實作的 networks
+  - `custom`：基於 `ref` 上另外添加一些資訊的 networks
+- `.p` 檔名末端的 `black`、`white`
+  - `black`：針對先手的 weights（黑棋先下）
+  - `white`：針對後手的 weights
+
 # Note
 
-> 每組跑 50 遍，共 100 場對局  
+> SA.py 跟助教提供的 AI 對局的結果  
+> 對局 100 場對
 > 對於相同 score 的 move -> 選擇第一個走訪的
 
 |參數|結果|
@@ -61,7 +80,8 @@
 
 ---
 
-> 每組跑 50 遍，共 100 場對局  
+> SA.py 跟助教提供的 AI 對局的結果  
+> 對局 100 場對
 > 對於相同 score 的 move -> 隨機挑一個  
 > 看起來沒有比較好
 
@@ -74,6 +94,12 @@
 |DURATION = 4.98<br/>WEIGHT_PIECE = 100.0<br/>WEIGHT_EDGE = 10.0<br/>WEIGHT_MOVE = 1.0|我方勝場：47<br/>平手：6<br/>我方勝率：47.0%<br/>對方勝率：47.0%|
 |DURATION = 4.98<br/>WEIGHT_PIECE = 1.0<br/>WEIGHT_EDGE = 100.0<br/>WEIGHT_MOVE = 10.0|我方勝場：49<br/>平手：7<br/>我方勝率：49.0%<br/>對方勝率：44.0%|
 |DURATION = 4.98<br/>WEIGHT_PIECE = 10.0<br/>WEIGHT_EDGE = 100.0<br/>WEIGHT_MOVE = 50.0|我方勝場：54<br/>平手：4<br/>我方勝率：54.0%<br/>對方勝率：42.0%|
+
+<style>
+table {
+    width:100%;
+}
+</style>
 
 # TODO
 
