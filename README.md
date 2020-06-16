@@ -46,6 +46,7 @@
 
 # Team_2.py
 
+- 詳細 code 請參考 reinforcement 與 td_agent_dev 兩個 branch
 - 將訓練好的 weights 用於對局
 
 # weight folder
